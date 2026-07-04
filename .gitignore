@@ -1,0 +1,12 @@
+# dependencies / build
+node_modules/
+dist/
+
+# per-run artifacts: plans, contracts, critiques, screenshots
+runs/
+
+# products built by the agent team
+workspace/
+
+# env
+.env
