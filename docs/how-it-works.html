@@ -1,0 +1,396 @@
+<title>Planner → Agent → Evaluator — как устроено</title>
+<style>
+  :root {
+    --paper: #f3f5f1;
+    --surface: #ffffff;
+    --surface-2: #fbfcfa;
+    --ink: #191d23;
+    --ink-soft: #58616c;
+    --line: #dde1db;
+    --planner: #0d8698;
+    --builder: #bd6f07;
+    --evaluator: #b028b8;
+    --flow: #2c8b4c;
+    --you: #d43a33;
+    --shadow: 0 1px 2px rgba(20,25,30,.06), 0 8px 24px rgba(20,25,30,.05);
+    --radius: 14px;
+    --maxw: 860px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #101318;
+      --surface: #191e26;
+      --surface-2: #1f2530;
+      --ink: #e9ece9;
+      --ink-soft: #9aa4ae;
+      --line: #2a313c;
+      --planner: #3fc9da;
+      --builder: #f0a838;
+      --evaluator: #e46bec;
+      --flow: #4dc574;
+      --you: #ff6d62;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #101318; --surface: #191e26; --surface-2: #1f2530;
+    --ink: #e9ece9; --ink-soft: #9aa4ae; --line: #2a313c;
+    --planner: #3fc9da; --builder: #f0a838; --evaluator: #e46bec;
+    --flow: #4dc574; --you: #ff6d62;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f5f1; --surface: #ffffff; --surface-2: #fbfcfa;
+    --ink: #191d23; --ink-soft: #58616c; --line: #dde1db;
+    --planner: #0d8698; --builder: #bd6f07; --evaluator: #b028b8;
+    --flow: #2c8b4c; --you: #d43a33;
+    --shadow: 0 1px 2px rgba(20,25,30,.06), 0 8px 24px rgba(20,25,30,.05);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 32px) 80px;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---- header ---- */
+  header { margin-bottom: 40px; }
+  .eyebrow {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 12px;
+  }
+  h1 {
+    font-size: clamp(26px, 5vw, 40px); line-height: 1.12; margin: 0 0 14px;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 700;
+  }
+  h1 .p { color: var(--planner); }
+  h1 .b { color: var(--builder); }
+  h1 .e { color: var(--evaluator); }
+  .lede { font-size: clamp(15px, 2.4vw, 18px); color: var(--ink-soft); max-width: 62ch; margin: 0; }
+
+  /* ---- legend ---- */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 10px;
+    margin: 26px 0 4px; padding: 0; list-style: none;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; padding: 6px 11px 6px 9px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .chip .role { font-weight: 600; }
+  .chip .desc { color: var(--ink-soft); }
+
+  /* ---- flow ---- */
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-top: 20px; }
+  .connector {
+    align-self: center; width: 2px; height: 26px; background: var(--line);
+    position: relative;
+  }
+  .connector::after {
+    content: ""; position: absolute; left: 50%; bottom: -1px;
+    width: 8px; height: 8px; border-right: 2px solid var(--line); border-bottom: 2px solid var(--line);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px 18px; position: relative;
+  }
+  .card.role { border-left: 4px solid var(--role, var(--line)); }
+  .card .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .card .tag {
+    font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .06em;
+    text-transform: uppercase; font-weight: 700; color: var(--role, var(--ink));
+  }
+  .card h3 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+  .card p { margin: 8px 0 0; color: var(--ink-soft); font-size: 14px; }
+  .files { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .file {
+    font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+    padding: 3px 8px; border-radius: 6px;
+    background: color-mix(in srgb, var(--role, var(--ink-soft)) 12%, var(--surface));
+    color: color-mix(in srgb, var(--role, var(--ink)) 80%, var(--ink));
+    border: 1px solid color-mix(in srgb, var(--role, var(--line)) 30%, var(--line));
+  }
+
+  /* role color binding */
+  .r-plan  { --role: var(--planner); }
+  .r-build { --role: var(--builder); }
+  .r-eval  { --role: var(--evaluator); }
+  .r-flow  { --role: var(--flow); }
+
+  /* loop container */
+  .loop {
+    border: 1.5px dashed color-mix(in srgb, var(--flow) 55%, var(--line));
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--flow) 5%, var(--surface-2));
+    padding: 14px; position: relative;
+  }
+  .loop > .loop-head {
+    display: flex; align-items: center; gap: 9px; margin: 2px 2px 12px;
+    font-size: 13px; color: var(--flow); font-weight: 650;
+  }
+  .loop-head .cyc { font-size: 15px; }
+  .loop-head .n {
+    font-family: ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 700;
+    color: var(--flow); background: color-mix(in srgb, var(--flow) 14%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--flow) 32%, var(--line));
+    padding: 2px 7px; border-radius: 999px; margin-left: auto;
+  }
+  .loop .inner { display: flex; flex-direction: column; gap: 0; }
+
+  .exchange { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; }
+  .exchange .swap {
+    align-self: center; color: var(--flow); font-size: 20px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  @media (max-width: 560px) {
+    .exchange { grid-template-columns: 1fr; }
+    .exchange .swap { transform: rotate(90deg); padding: 4px 0; }
+  }
+
+  .sprint-band {
+    display: flex; align-items: center; gap: 10px; margin: 4px 0 2px;
+    font-family: ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .sprint-band::before, .sprint-band::after {
+    content: ""; flex: 1; height: 1px; background: var(--line);
+  }
+
+  /* "ТЫ" participation marker */
+  .you-badge {
+    position: absolute; top: -10px; right: 12px;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    color: #fff; background: var(--you);
+    padding: 3px 9px; border-radius: 999px;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--you) 40%, transparent);
+  }
+  .you-badge::before { content: "◆"; font-size: 8px; }
+
+  /* participation section */
+  .part { margin-top: 48px; }
+  .part h2, .principles h2 {
+    font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .part h2 .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--you); }
+  .part .sub, .principles .sub { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+  .steps { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+  .step {
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start;
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--you); border-radius: 12px; padding: 14px 16px;
+  }
+  .step .when {
+    font-family: ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase; color: var(--you);
+    background: color-mix(in srgb, var(--you) 12%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--you) 30%, var(--line));
+    padding: 4px 9px; border-radius: 7px; white-space: nowrap; margin-top: 2px;
+  }
+  .step .body b { font-weight: 650; }
+  .step .body { font-size: 14px; }
+  .step .body p { margin: 4px 0 0; color: var(--ink-soft); }
+  .step .body .mono { font-size: 12.5px; color: var(--ink); }
+
+  /* principles */
+  .principles { margin-top: 44px; }
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+  .principle {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px;
+  }
+  .principle .k {
+    font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--flow); font-weight: 700; margin: 0 0 8px;
+  }
+  .principle p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+  .principle p b { color: var(--ink); font-weight: 600; }
+
+  footer { margin-top: 46px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--ink-soft); font-size: 13px; }
+  footer .mono { color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">маленькая продуктовая команда из агентов</p>
+    <h1><span class="p">Planner</span> → <span class="b">Agent</span> → <span class="e">Evaluator</span></h1>
+    <p class="lede">Три ИИ-агента с разными ролями собирают продукт по спринтам. У каждого — свой контекст и своя зона ответственности; общаются они только через файлы на диске. Красным отмечено, где в это можешь вмешаться ты.</p>
+
+    <ul class="legend">
+      <li class="chip"><span class="dot" style="background:var(--planner)"></span><span class="role">Planner</span><span class="desc">— план и спринты</span></li>
+      <li class="chip"><span class="dot" style="background:var(--builder)"></span><span class="role">Agent / Builder</span><span class="desc">— собирает</span></li>
+      <li class="chip"><span class="dot" style="background:var(--evaluator)"></span><span class="role">Evaluator</span><span class="desc">— строгий критик</span></li>
+      <li class="chip"><span class="dot" style="background:var(--you)"></span><span class="role">Ты</span><span class="desc">— точки участия</span></li>
+    </ul>
+  </header>
+
+  <!-- FLOW -->
+  <div class="flow">
+
+    <!-- request -->
+    <div class="card">
+      <span class="you-badge">Ты</span>
+      <div class="head"><span class="tag">Вход</span><h3>Короткий запрос</h3></div>
+      <p>Одна фраза: что собрать. Чем конкретнее ты можешь описать «что кликнуть и что должно произойти», тем лучше сработает вся схема.</p>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- planner -->
+    <div class="card role r-plan">
+      <div class="head"><span class="tag">Planner</span><h3>Разбивает на спринты</h3></div>
+      <p>Держит уровень продукта: что собираем, какие большие части, в каком порядке. <b>Не</b> расписывает техническую реализацию — ранняя ошибка в детальном плане поехала бы каскадом через часы работы.</p>
+      <div class="files">
+        <span class="file mono">plan.md</span>
+        <span class="file mono">sprints.json</span>
+      </div>
+    </div>
+
+    <div class="connector"></div>
+
+    <div class="sprint-band">для каждого спринта</div>
+    <div class="connector"></div>
+
+    <!-- contract loop -->
+    <div class="loop">
+      <div class="loop-head">
+        <span class="cyc">↺</span> Согласование контракта — до того, как написан код
+        <span class="n">CONTRACT_ROUNDS</span>
+      </div>
+      <div class="you-badge">Ты читаешь</div>
+      <div class="exchange">
+        <div class="card role r-build" style="box-shadow:none">
+          <div class="head"><span class="tag">Builder</span><h3>Предлагает критерии</h3></div>
+          <p>«Соберу вот это, проверять надо так» — список конкретных проверяемых утверждений.</p>
+        </div>
+        <div class="swap">⇄</div>
+        <div class="card role r-eval" style="box-shadow:none">
+          <div class="head"><span class="tag">Evaluator</span><h3>Ужесточает</h3></div>
+          <p>Добавляет edge-кейсы, пустые состояния, проверку «переживёт ли перезагрузку». Одобряет, когда критерии airtight.</p>
+        </div>
+      </div>
+      <div class="files" style="margin-top:12px">
+        <span class="file mono" style="--role:var(--flow)">contract.md</span>
+      </div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- build → evaluate → fix loop -->
+    <div class="loop">
+      <div class="loop-head">
+        <span class="cyc">↺</span> Собери → проверь → почини
+        <span class="n">FIX_ITERATIONS</span>
+      </div>
+      <div class="inner">
+        <div class="card role r-build" style="box-shadow:none">
+          <div class="head"><span class="tag">Builder</span><h3>Строит спринт</h3></div>
+          <p>Реализует так, чтобы прошёл <b>каждый</b> критерий контракта. Инструменты: чтение, запись, правка файлов, запуск команд.</p>
+        </div>
+        <div class="connector" style="height:20px"></div>
+        <div class="card role r-eval" style="box-shadow:none">
+          <div class="head"><span class="tag">Evaluator</span><h3>Проверяет в браузере</h3></div>
+          <p>Поднимает сервер, открывает приложение через Playwright, кликает по интерфейсу, снимает и <b>смотрит</b> скриншоты, ловит ошибки консоли. Критерий без доказательства = провал.</p>
+          <div class="files">
+            <span class="file mono">critique.md</span>
+            <span class="file mono">verdict.json</span>
+            <span class="file mono">screenshots/</span>
+          </div>
+        </div>
+        <div class="connector" style="height:20px"></div>
+        <div class="card role r-flow" style="box-shadow:none; background:color-mix(in srgb, var(--flow) 6%, var(--surface))">
+          <div class="head"><span class="tag">Развилка</span><h3>Прошёл контракт?</h3></div>
+          <p><b style="color:var(--flow)">Да</b> → следующий спринт. &nbsp;<b style="color:var(--you)">Нет</b> → builder чинит по критике, и цикл повторяется (до лимита итераций).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"></div>
+
+    <div class="card role r-flow">
+      <div class="head"><span class="tag">Итог</span><h3>Готовый продукт + весь след процесса</h3></div>
+      <p>Собранное приложение в <span class="mono">workspace/</span>, а рядом — план, контракты, критика, вердикты и скриншоты в <span class="mono">runs/</span>. Это не только результат, но и отладочный след.</p>
+    </div>
+
+  </div>
+
+  <!-- PARTICIPATION -->
+  <section class="part">
+    <h2><span class="swatch"></span>Где ты участвуешь</h2>
+    <p class="sub">Схема автономна, но у неё есть пять дешёвых точек вмешательства. Самая важная — вторая.</p>
+    <ol class="steps">
+      <li class="step">
+        <span class="when">до запуска</span>
+        <div class="body"><b>Формулируешь запрос.</b>
+          <p>Проверь себя: сможешь перечислить, что кликнуть и что должно произойти? Если нет — задача либо не для этой схемы, либо её надо доформулировать.</p></div>
+      </li>
+      <li class="step">
+        <span class="when">до сборки ★</span>
+        <div class="body"><b>Читаешь <span class="mono">contract.md</span>.</b>
+          <p>Здесь сидит почти весь рычаг качества. Одна правка критерия до сборки экономит часы фиксов после: расплывчатый критерий → расплывчатая критика, конкретный → точная проблема.</p></div>
+      </li>
+      <li class="step">
+        <span class="when">настройка</span>
+        <div class="body"><b>Задаёшь модели и лимиты.</b>
+          <p><span class="mono">MODEL</span>, <span class="mono">CONTRACT_ROUNDS</span>, <span class="mono">FIX_ITERATIONS</span> — черновик дёшево (Sonnet, короткий цикл), чистовик дорого (Opus, полные лимиты). Модель можно задать по ролям.</p></div>
+      </li>
+      <li class="step">
+        <span class="when">после</span>
+        <div class="body"><b>Смотришь артефакты.</b>
+          <p>Если спринт завис на лимите — диагноз почти всегда в <span class="mono">critique.md</span> и скриншотах: контракт требовал невозможного, или builder не смог починить конкретный критерий.</p></div>
+      </li>
+      <li class="step">
+        <span class="when">в любой момент</span>
+        <div class="body"><b>Останавливаешь прогон.</b>
+          <p>Каждая роль — полный агент, и всё это реальные токены с твоего аккаунта. Остановка не теряет уже собранное — артефакты остаются на диске.</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section class="principles">
+    <h2>Почему это работает</h2>
+    <p class="sub">Качество держится не на «модель умная», а на архитектуре процесса.</p>
+    <div class="pgrid">
+      <div class="principle">
+        <p class="k">Раздельные контексты</p>
+        <p>Каждая роль — <b>свой</b> контекст и промпт. Общаются только через файлы. Всё, что должно дойти от builder к evaluator, обязано быть в контракте.</p>
+      </div>
+      <div class="principle">
+        <p class="k">Отдельный критик</p>
+        <p>Evaluator — независимый агент с адверсариальной инструкцией. Отдельного критика <b>проще держать строгим</b>, чем заставить builder честно проверять себя.</p>
+      </div>
+      <div class="principle">
+        <p class="k">Контракт вместо запроса</p>
+        <p>Evaluator проверяет не расплывчатый исходный запрос, а <b>согласованный список конкретных критериев</b>. Это создаёт нормальное давление на качество.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Реальный прогон из этой сессии: план на <span class="mono">3 спринта</span>, спринт&nbsp;1 прошёл цикл
+    <span class="mono">собран → 11/12 → починен → 12/12</span> полностью автономно.
+    Код — в ветке <span class="mono">claude/agent-planner-evaluator-pattern</span>.
+  </footer>
+</div>
