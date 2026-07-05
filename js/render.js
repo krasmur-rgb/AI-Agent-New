@@ -51,7 +51,7 @@ function fmtVec(vec, rivers) {
    Стартовая страница
    ============================================================ */
 export function renderStart(view) {
-  const { title, subtitle, imageBase, onStart } = view;
+  const { title, subtitle, intro, buttonLabel, imageBase, onStart } = view;
 
   const wrap = el('div', 'start-screen');
   wrap.appendChild(imageBlock(imageBase, 'Анна Каренина'));
@@ -60,9 +60,16 @@ export function renderStart(view) {
   box.appendChild(txtEl('h1', 'start-title', title));
   if (subtitle) box.appendChild(txtEl('p', 'start-subtitle', subtitle));
 
+  // предисловие
+  if (intro && intro.length) {
+    const introBlock = el('div', 'start-intro');
+    intro.forEach((par) => introBlock.appendChild(txtEl('p', null, par)));
+    box.appendChild(introBlock);
+  }
+
   const btn = el('button', 'btn btn-primary start-btn');
   btn.type = 'button';
-  btn.textContent = 'Начать историю';
+  btn.textContent = buttonLabel || 'Начать';
   btn.addEventListener('click', onStart);
   box.appendChild(btn);
 

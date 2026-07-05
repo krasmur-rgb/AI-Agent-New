@@ -189,8 +189,17 @@ body {
   font-size: 17px;
   font-style: italic;
   color: var(--ink-soft);
-  margin: 0 0 24px;
+  margin: 0 0 20px;
 }
+.start-intro {
+  max-width: 640px;
+  margin: 0 auto 26px;
+  text-align: left;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.start-intro p { margin: 0 0 0.9em; }
+.start-intro p:last-child { margin-bottom: 0; }
 .start-btn {
   font-size: 18px;
   padding: 12px 42px;
