@@ -26,6 +26,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  overflow-x: clip;   /* full-bleed блоки (100vw) не должны давать горизонтальный скролл */
 }
 
 body {
@@ -162,23 +163,36 @@ body {
 }
 
 /* ---------- Стартовая страница ---------- */
+/* во всю ширину экрана (выходим за пределы контейнера #app) */
 .start-screen {
-  max-width: 880px;
-  margin: 0 auto;
-  padding-top: 26px;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding-top: 0;
 }
 .start-screen .scene-img-wrap {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: auto;
+  height: 76vh;
   margin-bottom: 0;
-  border-radius: 5px 5px 0 0;
+  border: none;
+  border-radius: 0;
 }
+/* кнопка — прямо на картинке, в левом нижнем углу */
+.start-cta {
+  position: absolute;
+  left: 40px;
+  bottom: 34px;
+  z-index: 2;
+}
+.start-btn {
+  font-size: 19px;
+  padding: 14px 46px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+}
+/* текст-описание тоже во всю ширину */
 .start-box {
-  border: 1px solid var(--line);
-  border-top: none;
-  border-radius: 0 0 5px 5px;
-  background: var(--paper2);
   text-align: center;
-  padding: 30px 36px 34px;
+  padding: 30px 5vw 44px;
 }
 .start-title {
   font-size: 34px;
@@ -192,24 +206,20 @@ body {
   margin: 0 0 20px;
 }
 .start-intro {
-  max-width: 640px;
-  margin: 0 auto 26px;
+  max-width: none;
+  margin: 0 0 4px;
   text-align: left;
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.6;
 }
 .start-intro p { margin: 0 0 0.9em; }
 .start-intro p:last-child { margin-bottom: 0; }
-.start-btn {
-  font-size: 18px;
-  padding: 12px 42px;
-  letter-spacing: 0.04em;
-}
 @media (max-width: 767px) {
-  .start-screen { padding-top: 12px; }
-  .start-screen .scene-img-wrap { aspect-ratio: 4 / 5; }
+  .start-screen .scene-img-wrap { height: 64vh; }
+  .start-cta { left: 16px; bottom: 18px; }
+  .start-btn { font-size: 17px; padding: 12px 32px; }
   .start-title { font-size: 26px; }
-  .start-box { padding: 22px 18px 26px; }
+  .start-box { padding: 22px 16px 30px; }
 }
 
 /* ---------- Объединительная рамка эпизода (картинка + текст + выборы) ---------- */

@@ -54,7 +54,17 @@ export function renderStart(view) {
   const { title, subtitle, intro, buttonLabel, imageBase, onStart } = view;
 
   const wrap = el('div', 'start-screen');
-  wrap.appendChild(imageBlock(imageBase, 'Анна Каренина'));
+
+  // картинка во всю ширину, кнопка — поверх, в левом нижнем углу
+  const hero = imageBlock(imageBase, 'Анна Каренина');
+  const cta = el('div', 'start-cta');
+  const btn = el('button', 'btn btn-primary start-btn');
+  btn.type = 'button';
+  btn.textContent = buttonLabel || 'Начать';
+  btn.addEventListener('click', onStart);
+  cta.appendChild(btn);
+  hero.appendChild(cta);
+  wrap.appendChild(hero);
 
   const box = el('div', 'start-box');
   box.appendChild(txtEl('h1', 'start-title', title));
@@ -66,12 +76,6 @@ export function renderStart(view) {
     intro.forEach((par) => introBlock.appendChild(txtEl('p', null, par)));
     box.appendChild(introBlock);
   }
-
-  const btn = el('button', 'btn btn-primary start-btn');
-  btn.type = 'button';
-  btn.textContent = buttonLabel || 'Начать';
-  btn.addEventListener('click', onStart);
-  box.appendChild(btn);
 
   wrap.appendChild(box);
 
