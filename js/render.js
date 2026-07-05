@@ -73,6 +73,7 @@ export function renderStart(view) {
   // предисловие
   if (intro && intro.length) {
     const introBlock = el('div', 'start-intro');
+    if (view.introTitle) introBlock.appendChild(txtEl('h2', 'start-intro-title', view.introTitle));
     intro.forEach((par) => introBlock.appendChild(txtEl('p', null, par)));
     box.appendChild(introBlock);
   }

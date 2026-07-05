@@ -212,12 +212,24 @@ body {
   color: var(--ink-soft);
   margin: 0 0 12px;
 }
+/* лицо Анны целиком: прижимаем кадр к верху изображения */
+.start-screen .scene-img { object-position: center top; }
+
 .start-intro {
   max-width: none;
   margin: 0;
   text-align: left;
   font-size: 17px;
   line-height: 1.5;
+}
+.start-intro-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin: 0 0 10px;
 }
 .start-intro p { margin: 0 0 0.6em; }
 .start-intro p:last-child { margin-bottom: 0; }
