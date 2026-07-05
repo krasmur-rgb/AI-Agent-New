@@ -64,13 +64,18 @@ export function renderScene(view, handlers) {
     scene.appendChild(head);
   }
 
-  // картинка
-  scene.appendChild(imageBlock(imageBase, code));
+  // двухколоночная сетка: слева картинка, справа текст + выборы (широкий экран)
+  const grid = el('div', 'scene-grid');
+  const visual = el('div', 'scene-visual');
+  visual.appendChild(imageBlock(imageBase, code));
+  grid.appendChild(visual);
+
+  const main = el('div', 'scene-main');
 
   // проза
   const prose = el('div', 'prose');
   prose.innerHTML = proseHtml;
-  scene.appendChild(prose);
+  main.appendChild(prose);
 
   // выборы
   const list = el('ul', 'choices');
@@ -98,13 +103,16 @@ export function renderScene(view, handlers) {
 
     list.appendChild(li);
   });
-  scene.appendChild(list);
+  main.appendChild(list);
 
   // панель тяг (debug)
-  scene.appendChild(pullPanel(debug));
+  main.appendChild(pullPanel(debug));
 
   // заметки отладчика
-  scene.appendChild(noteBox(code, view));
+  main.appendChild(noteBox(code, view));
+
+  grid.appendChild(main);
+  scene.appendChild(grid);
 
   // заменить содержимое
   app.innerHTML = '';
@@ -237,7 +245,7 @@ export function showFinale(view) {
   const { finale, rule, debugText, onRestart } = view;
   app.innerHTML = '';
 
-  const wrap = el('div', 'scene');
+  const wrap = el('div', 'scene finale');
   wrap.appendChild(txtEl('div', 'finale-kicker', 'Финал'));
   wrap.appendChild(txtEl('div', 'finale-name', finale.name));
   wrap.appendChild(txtEl('p', 'finale-paid', 'Заплачено: ' + finale.paid));

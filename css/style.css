@@ -17,7 +17,8 @@
   --dbg:     #2f5560;
 
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --maxw: 720px;
+  --maxw: 1400px;   /* широкий контейнер: используем свободное место по краям */
+  --readw: 680px;   /* читаемая ширина одиночной колонки (финал, узкий экран) */
 }
 
 * { box-sizing: border-box; }
@@ -91,11 +92,13 @@ body {
   font-style: italic;
 }
 
-.scene { padding-top: 22px; }
+/* Одиночная колонка по умолчанию (мобильный/узкий экран) — читаемая ширина */
+.scene { padding-top: 16px; max-width: var(--readw); margin-inline: auto; }
+.scene-main { min-width: 0; }
 
 .act-head {
-  margin: 6px 0 18px;
-  padding-bottom: 10px;
+  margin: 2px 0 14px;
+  padding-bottom: 9px;
   border-bottom: 1px solid var(--line);
 }
 .act-num {
@@ -461,6 +464,43 @@ body.debug .modal-dbg {
 /* Заметки отладчика тоже часть служебного слоя */
 .note-box { display: none; }
 body.debug .note-box { display: block; }
+
+/* ============================================================
+   Широкий экран (≥ 900px): две колонки — картинка | текст + выборы.
+   Всё видно на стартовом экране без прокрутки, поля по краям заполнены.
+   ============================================================ */
+@media (min-width: 900px) {
+  .scene { max-width: none; margin-inline: 0; }
+  .scene-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+  /* картинка держится в поле зрения, пока справа листается текст/отладка */
+  .scene-visual { position: sticky; top: 72px; }
+  .scene-visual .scene-img-wrap {
+    margin-bottom: 0;
+    max-height: calc(100vh - 92px);
+  }
+  /* компактнее по вертикали — чтобы картинка + проза + выборы влезли на первый экран */
+  .act-head { margin: 0 0 10px; padding-bottom: 8px; }
+  .act-title { font-size: 20px; }
+  .scene-main .prose { font-size: 18px; line-height: 1.5; }
+  .scene-main .prose p { margin-bottom: 0.7em; }
+  .scene-main .prose .dlg { margin: 0.7em 0; }
+  .scene-main .choices { margin-top: 16px; gap: 9px; }
+  .scene-main .choice-btn { padding: 10px 15px; }
+  .scene-main .choice-tag { margin-bottom: 2px; }
+  .scene-main .choice-dbg { padding: 5px 15px; }
+  /* финал остаётся узкой читаемой колонкой по центру */
+  .scene.finale { max-width: var(--readw); margin-inline: auto; }
+}
+
+/* Очень широкие экраны — картинка ещё вольготнее */
+@media (min-width: 1500px) {
+  .scene-grid { gap: 52px; }
+}
 
 /* ---------- Адаптив (мобильный < 768px) ---------- */
 @media (max-width: 767px) {
