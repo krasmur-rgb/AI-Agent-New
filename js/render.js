@@ -81,6 +81,11 @@ export function renderScene(view, handlers) {
   const episode = el('div', 'episode');
   episode.appendChild(top);
 
+  // плашка-призыв между сценой и вариантами
+  const askBanner = el('div', 'ask-banner');
+  askBanner.textContent = 'Как отреагирует Анна?';
+  episode.appendChild(askBanner);
+
   // выборы
   const list = el('ul', 'choices');
   choices.forEach((ch, i) => {
