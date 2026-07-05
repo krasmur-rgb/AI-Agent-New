@@ -159,8 +159,32 @@ body {
   text-transform: uppercase;
 }
 
+/* ---------- Объединительная рамка эпизода (картинка + текст + выборы) ---------- */
+.episode {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--paper2);
+}
+/* внутри рамки — общие поля без собственных обводок; разделители — линиями */
+.episode .scene-img-wrap { border: none; border-radius: 0; margin: 0; }
+.episode .choices { margin: 0; }
+.episode .choice {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.episode .choice:hover { box-shadow: none; background: rgba(106, 42, 42, 0.05); }
+
+/* Узкий/мобильный экран: части сложены столбиком, разделены линиями */
+@media (max-width: 899px) {
+  .episode .scene-text { border-top: 1px solid var(--line); }
+  .episode .choices { border-top: 1px solid var(--line); }
+  .episode .choices > .choice + .choice { border-top: 1px solid var(--line); }
+}
+
 /* ---------- Проза сцены ---------- */
-.prose { font-size: 19px; }
+.prose { font-size: 20px; }
 .prose p { margin: 0 0 1em; }
 .prose .dlg { margin: 1.1em 0; }
 .prose .dlg p { margin: 0.2em 0; }
@@ -474,54 +498,48 @@ body.debug .note-box { display: block; }
 @media (min-width: 900px) {
   .scene { max-width: none; margin-inline: 0; }
 
-  /* верх: две равные панели одинаковой высоты — картинка слева, текст справа */
-  .scene-top {
+  .act-head { margin: 0 0 12px; padding-bottom: 8px; }
+  .act-title { font-size: 20px; }
+
+  /* верх рамки: картинка слева, описание справа — равные половины */
+  .episode .scene-top {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(58vh, auto);   /* блоки заполняют площадь экрана */
-    gap: 28px;
-    align-items: stretch;                     /* обе колонки одной высоты */
+    grid-template-rows: minmax(46vh, auto);   /* высота блока, обе половины равны */
+    gap: 0;
+    align-items: stretch;
   }
   /* .scene-visual уже order:-1 (из базовых правил) → картинка слева */
-
-  /* левая панель: картинка заполняет всю высоту блока */
-  .scene-visual { display: flex; }
-  .scene-visual .scene-img-wrap {
-    margin-bottom: 0;
-    aspect-ratio: auto;            /* высоту задаёт колонка, а не пропорция */
+  .episode .scene-visual { height: 100%; }
+  .episode .scene-visual .scene-img-wrap {
+    aspect-ratio: auto;            /* высоту задаёт блок, картинка заполняет её */
     width: 100%;
     height: 100%;
   }
 
-  /* правая панель: такой же обрамлённый блок, текст распределён по всей высоте */
-  .scene-text {
-    display: flex;
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    background: var(--paper2);
-    padding: 26px 30px;
-  }
-  .scene-text .prose {
-    flex: 1;
+  /* правая половина: описание, крупный текст, по центру высоты, без распорок */
+  .episode .scene-text {
+    border-left: 1px solid var(--line);   /* разделитель картинка | текст */
+    padding: 30px 34px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;   /* равномерно по всей высоте панели */
-    font-size: 18px;
-    line-height: 1.55;
+    justify-content: center;
   }
-  .scene-text .prose > *:first-child { margin-top: 0; }
-  .scene-text .prose > *:last-child { margin-bottom: 0; }
-
-  .act-head { margin: 0 0 12px; padding-bottom: 8px; }
-  .act-title { font-size: 20px; }
-
-  /* варианты выбора — в один ряд под сценой */
-  .choices {
-    flex-direction: row;
-    gap: 14px;
-    margin-top: 22px;
+  .episode .scene-text .prose {
+    font-size: 21px;
+    line-height: 1.6;
   }
-  .choices > .choice { flex: 1 1 0; min-width: 0; }
+
+  /* нижняя полоса рамки: варианты в один ряд, разделённые линиями */
+  .episode .choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .episode .choices > .choice { border-left: 1px solid var(--line); }
+  .episode .choices > .choice:first-child { border-left: none; }
 
   /* финал остаётся узкой читаемой колонкой по центру */
   .scene.finale { max-width: var(--readw); margin-inline: auto; }
@@ -538,7 +556,7 @@ body.debug .note-box { display: block; }
   #app { padding: 0 14px 60px; }
   .topbar-inner { padding: 9px 14px; }
   .scene-img-wrap { aspect-ratio: 4 / 5; }  /* вертикальный кроп */
-  .prose { font-size: 18px; }
+  .prose { font-size: 19px; }
   .act-title { font-size: 20px; }
   .modal { padding: 22px 18px; }
 }

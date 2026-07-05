@@ -77,7 +77,9 @@ export function renderScene(view, handlers) {
   visual.appendChild(imageBlock(imageBase, code));
   top.appendChild(visual);
 
-  scene.appendChild(top);
+  // объединительная рамка: картинка + описание + выборы = один большой блок
+  const episode = el('div', 'episode');
+  episode.appendChild(top);
 
   // выборы
   const list = el('ul', 'choices');
@@ -105,7 +107,8 @@ export function renderScene(view, handlers) {
 
     list.appendChild(li);
   });
-  scene.appendChild(list);
+  episode.appendChild(list);
+  scene.appendChild(episode);
 
   // панель тяг (debug)
   scene.appendChild(pullPanel(debug));
