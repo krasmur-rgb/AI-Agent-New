@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Анна Каренина · интерактивная драма</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="debug">
+  <header id="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span id="doc-title">Анна Каренина</span>
+        <span id="doc-subtitle" class="doc-subtitle"></span>
+      </div>
+      <label class="dbg-toggle" title="Служебный слой отладки">
+        <input type="checkbox" id="debug-checkbox" checked>
+        <span>режим отладки</span>
+      </label>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Сцена рендерится сюда движком -->
+    <div id="loading" class="loading">Загрузка сценария…</div>
+  </main>
+
+  <!-- Модальное окно развязки акта / финала -->
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div id="modal-body"></div>
+      <button id="modal-continue" class="btn btn-primary">Дальше</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно выгрузки заметок -->
+  <div id="dump-overlay" class="modal-overlay" hidden>
+    <div class="modal modal-wide">
+      <h2 class="modal-h">Все заметки отладчика</h2>
+      <p id="dump-status" class="dump-status"></p>
+      <textarea id="dump-area" class="dump-area" readonly></textarea>
+      <div class="modal-actions">
+        <button id="dump-copy" class="btn">Скопировать</button>
+        <button id="dump-close" class="btn btn-primary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/engine.js"></script>
+</body>
+</html>
