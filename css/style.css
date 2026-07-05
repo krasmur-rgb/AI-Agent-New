@@ -104,13 +104,15 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .act-num {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--gold);
 }
 .act-title {
-  font-size: 22px;
+  font-size: 30px;
+  font-weight: 700;
   margin: 2px 0 4px;
 }
 .act-q {
@@ -174,11 +176,11 @@ body {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--paper);
   background: var(--accent);
-  padding: 12px 16px;
+  padding: 6px 16px;
 }
 
 /* Варианты (реакция Анны) — каждый со своей мягкой заливкой:
@@ -517,8 +519,8 @@ body.debug .note-box { display: block; }
 @media (min-width: 900px) {
   .scene { max-width: none; margin-inline: 0; }
 
-  .act-head { margin: 0 0 12px; padding-bottom: 8px; }
-  .act-title { font-size: 20px; }
+  .scene { padding-top: 10px; }
+  .act-head { margin: 0 0 10px; padding-bottom: 7px; }
 
   /* верх рамки: картинка слева, описание справа — равные половины */
   .episode .scene-top {
@@ -576,6 +578,6 @@ body.debug .note-box { display: block; }
   .topbar-inner { padding: 9px 14px; }
   .scene-img-wrap { aspect-ratio: 4 / 5; }  /* вертикальный кроп */
   .prose { font-size: 19px; }
-  .act-title { font-size: 20px; }
+  .act-title { font-size: 24px; }
   .modal { padding: 22px 18px; }
 }
