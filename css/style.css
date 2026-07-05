@@ -474,22 +474,46 @@ body.debug .note-box { display: block; }
 @media (min-width: 900px) {
   .scene { max-width: none; margin-inline: 0; }
 
-  /* верх: описание слева, картинка справа */
+  /* верх: две равные панели одинаковой высоты — картинка слева, текст справа */
   .scene-top {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 40px;
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(58vh, auto);   /* блоки заполняют площадь экрана */
+    gap: 28px;
+    align-items: stretch;                     /* обе колонки одной высоты */
   }
-  .scene-top .scene-visual { order: 0; }   /* картинка справа (по порядку в разметке) */
+  /* .scene-visual уже order:-1 (из базовых правил) → картинка слева */
+
+  /* левая панель: картинка заполняет всю высоту блока */
+  .scene-visual { display: flex; }
   .scene-visual .scene-img-wrap {
     margin-bottom: 0;
-    max-height: calc(100vh - 92px);
+    aspect-ratio: auto;            /* высоту задаёт колонка, а не пропорция */
+    width: 100%;
+    height: 100%;
   }
+
+  /* правая панель: такой же обрамлённый блок, текст распределён по всей высоте */
+  .scene-text {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper2);
+    padding: 26px 30px;
+  }
+  .scene-text .prose {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;   /* равномерно по всей высоте панели */
+    font-size: 18px;
+    line-height: 1.55;
+  }
+  .scene-text .prose > *:first-child { margin-top: 0; }
+  .scene-text .prose > *:last-child { margin-bottom: 0; }
 
   .act-head { margin: 0 0 12px; padding-bottom: 8px; }
   .act-title { font-size: 20px; }
-  .scene-text .prose { font-size: 18px; line-height: 1.55; }
 
   /* варианты выбора — в один ряд под сценой */
   .choices {
