@@ -135,10 +135,10 @@ function enterAct(i) {
     sceneList = currentAct.scenes;
   }
   scenePos = 0;
-  showScene(true);
+  showScene();
 }
 
-function showScene(withHeader) {
+function showScene() {
   const scene = sceneList[scenePos];
   visitedOrder.push(scene.code);
 
@@ -149,9 +149,8 @@ function showScene(withHeader) {
   }
 
   const view = {
-    actHeader: withHeader
-      ? { num: currentAct.num, title: currentAct.title, q: currentAct.q }
-      : null,
+    // шапка акта видна на каждой сцене
+    actHeader: { num: currentAct.num, title: currentAct.title, q: currentAct.q },
     code: scene.code,
     proseHtml,
     choices: scene.choices,
@@ -183,7 +182,7 @@ function onChoice(scene, idx) {
 function advance() {
   scenePos++;
   if (scenePos < sceneList.length) {
-    showScene(false);
+    showScene();
   } else {
     endAct();
   }
