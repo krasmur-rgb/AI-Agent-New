@@ -53,10 +53,18 @@ function fmtVec(vec, rivers) {
 export function renderStart(view) {
   const { title, subtitle, intro, buttonLabel, imageBase, onStart } = view;
 
+  document.body.classList.add('on-start');   // прячем шапку сайта: заголовок живёт на картинке
   const wrap = el('div', 'start-screen');
 
-  // картинка во всю ширину, кнопка — поверх, в левом нижнем углу
+  // картинка во всю ширину; заголовок — на картинке в верхнем левом углу,
+  // кнопка — в левом нижнем
   const hero = imageBlock(imageBase, 'Анна Каренина');
+
+  const overlay = el('div', 'start-hero-overlay');
+  overlay.appendChild(txtEl('h1', 'start-title', title));
+  if (subtitle) overlay.appendChild(txtEl('p', 'start-subtitle', subtitle));
+  hero.appendChild(overlay);
+
   const cta = el('div', 'start-cta');
   const btn = el('button', 'btn btn-primary start-btn');
   btn.type = 'button';
@@ -67,8 +75,6 @@ export function renderStart(view) {
   wrap.appendChild(hero);
 
   const box = el('div', 'start-box');
-  box.appendChild(txtEl('h1', 'start-title', title));
-  if (subtitle) box.appendChild(txtEl('p', 'start-subtitle', subtitle));
 
   // предисловие
   if (intro && intro.length) {
@@ -89,6 +95,7 @@ export function renderStart(view) {
    Отрисовка сцены
    ============================================================ */
 export function renderScene(view, handlers) {
+  document.body.classList.remove('on-start');
   const { actHeader, code, proseHtml, choices, imageBase, debug } = view;
 
   const scene = el('div', 'scene');
@@ -287,6 +294,7 @@ export function showResolution(res, onContinue) {
    Финал
    ============================================================ */
 export function showFinale(view) {
+  document.body.classList.remove('on-start');
   const { finale, rule, debugText, onRestart } = view;
   app.innerHTML = '';
 

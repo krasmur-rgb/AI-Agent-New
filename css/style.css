@@ -165,14 +165,44 @@ body {
 /* ---------- Стартовая страница ---------- */
 /* во всю ширину экрана (выходим за пределы контейнера #app)
    и ровно в один экран по высоте: картинка занимает всё свободное место */
+/* на старте шапка сайта скрыта: заголовок перенесён на картинку */
+body.on-start #topbar { display: none; }
+
 .start-screen {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   padding-top: 0;
-  height: calc(100dvh - 69px);   /* минус шапка */
+  height: 100dvh;                /* шапки нет — картинка растёт вверх */
   display: flex;
   flex-direction: column;
   margin-bottom: -80px;          /* гасим нижний отступ #app, чтобы не было скролла */
+}
+/* заголовок на картинке, верхний левый угол; фон — дымчато-тёмный,
+   в тон паровозной гамме, но контрастный для чтения */
+.start-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  max-width: min(560px, 72%);
+  background: linear-gradient(160deg, rgba(43,38,31,0.72), rgba(58,52,42,0.58));
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  border-bottom-right-radius: 6px;
+  padding: 16px 26px 14px 40px;
+}
+.start-hero-overlay .start-title {
+  font-size: 27px;
+  font-weight: 700;
+  margin: 0 0 3px;
+  color: #f0e8d4;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.start-hero-overlay .start-subtitle {
+  font-size: 14.5px;
+  font-style: italic;
+  color: rgba(240,232,212,0.85);
+  margin: 0;
 }
 .start-screen .scene-img-wrap {
   aspect-ratio: auto;
@@ -199,18 +229,7 @@ body {
 .start-box {
   flex: 0 0 auto;
   text-align: center;
-  padding: 16px 4vw 20px;
-}
-.start-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 4px;
-}
-.start-subtitle {
-  font-size: 15px;
-  font-style: italic;
-  color: var(--ink-soft);
-  margin: 0 0 12px;
+  padding: 14px 4vw 18px;
 }
 /* лицо Анны целиком: прижимаем кадр к верху изображения */
 .start-screen .scene-img { object-position: center top; }
@@ -234,11 +253,12 @@ body {
 .start-intro p { margin: 0 0 0.6em; }
 .start-intro p:last-child { margin-bottom: 0; }
 @media (max-width: 767px) {
-  .start-screen { height: calc(100dvh - 116px); margin-bottom: -60px; }
+  .start-screen { height: 100dvh; margin-bottom: -60px; }
   .start-cta { left: 16px; bottom: 18px; }
   .start-btn { font-size: 16px; padding: 10px 26px; }
-  .start-title { font-size: 21px; }
-  .start-subtitle { font-size: 13.5px; margin-bottom: 8px; }
+  .start-hero-overlay { max-width: 88%; padding: 10px 16px 9px 16px; }
+  .start-hero-overlay .start-title { font-size: 19px; }
+  .start-hero-overlay .start-subtitle { font-size: 12.5px; }
   .start-intro { font-size: 14.5px; line-height: 1.45; }
   .start-box { padding: 12px 14px 14px; }
 }
