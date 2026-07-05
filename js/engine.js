@@ -4,8 +4,8 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, showResolution, showFinale } from './render.js';
-import { wireDumpModal } from './comments.js';
+import { renderScene, showResolution, showFinale } from './render.js?v=3';
+import { wireDumpModal } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
    Калибруются автором после пилота. Значения по умолчанию — из
@@ -250,7 +250,7 @@ async function init() {
   wireDumpModal();
 
   try {
-    const resp = await fetch('data/scenario_data.json');
+    const resp = await fetch('data/scenario_data.json?v=3');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     DATA = await resp.json();
   } catch (e) {

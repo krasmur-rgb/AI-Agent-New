@@ -4,7 +4,7 @@
    что передал движок.
    ============================================================ */
 
-import { getNote, setNote, openDump } from './comments.js';
+import { getNote, setNote, openDump } from './comments.js?v=3';
 
 const app = document.getElementById('app');
 
