@@ -94,7 +94,9 @@ body {
 
 /* Одиночная колонка по умолчанию (мобильный/узкий экран) — читаемая ширина */
 .scene { padding-top: 16px; max-width: var(--readw); margin-inline: auto; }
-.scene-main { min-width: 0; }
+.scene-top { display: flex; flex-direction: column; }
+.scene-top .scene-visual { order: -1; }   /* на мобильном картинка сверху */
+.scene-text { min-width: 0; }
 
 .act-head {
   margin: 2px 0 14px;
@@ -471,28 +473,32 @@ body.debug .note-box { display: block; }
    ============================================================ */
 @media (min-width: 900px) {
   .scene { max-width: none; margin-inline: 0; }
-  .scene-grid {
+
+  /* верх: описание слева, картинка справа */
+  .scene-top {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 40px;
     align-items: start;
   }
-  /* картинка держится в поле зрения, пока справа листается текст/отладка */
-  .scene-visual { position: sticky; top: 72px; }
+  .scene-top .scene-visual { order: 0; }   /* картинка справа (по порядку в разметке) */
   .scene-visual .scene-img-wrap {
     margin-bottom: 0;
     max-height: calc(100vh - 92px);
   }
-  /* компактнее по вертикали — чтобы картинка + проза + выборы влезли на первый экран */
-  .act-head { margin: 0 0 10px; padding-bottom: 8px; }
+
+  .act-head { margin: 0 0 12px; padding-bottom: 8px; }
   .act-title { font-size: 20px; }
-  .scene-main .prose { font-size: 18px; line-height: 1.5; }
-  .scene-main .prose p { margin-bottom: 0.7em; }
-  .scene-main .prose .dlg { margin: 0.7em 0; }
-  .scene-main .choices { margin-top: 16px; gap: 9px; }
-  .scene-main .choice-btn { padding: 10px 15px; }
-  .scene-main .choice-tag { margin-bottom: 2px; }
-  .scene-main .choice-dbg { padding: 5px 15px; }
+  .scene-text .prose { font-size: 18px; line-height: 1.55; }
+
+  /* варианты выбора — в один ряд под сценой */
+  .choices {
+    flex-direction: row;
+    gap: 14px;
+    margin-top: 22px;
+  }
+  .choices > .choice { flex: 1 1 0; min-width: 0; }
+
   /* финал остаётся узкой читаемой колонкой по центру */
   .scene.finale { max-width: var(--readw); margin-inline: auto; }
 }

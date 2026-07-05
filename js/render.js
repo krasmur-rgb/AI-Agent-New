@@ -64,18 +64,20 @@ export function renderScene(view, handlers) {
     scene.appendChild(head);
   }
 
-  // двухколоночная сетка: слева картинка, справа текст + выборы (широкий экран)
-  const grid = el('div', 'scene-grid');
-  const visual = el('div', 'scene-visual');
-  visual.appendChild(imageBlock(imageBase, code));
-  grid.appendChild(visual);
+  // верх: слева описание сцены, справа картинка (широкий экран)
+  const top = el('div', 'scene-top');
 
-  const main = el('div', 'scene-main');
-
-  // проза
+  const text = el('div', 'scene-text');
   const prose = el('div', 'prose');
   prose.innerHTML = proseHtml;
-  main.appendChild(prose);
+  text.appendChild(prose);
+  top.appendChild(text);
+
+  const visual = el('div', 'scene-visual');
+  visual.appendChild(imageBlock(imageBase, code));
+  top.appendChild(visual);
+
+  scene.appendChild(top);
 
   // выборы
   const list = el('ul', 'choices');
@@ -103,16 +105,13 @@ export function renderScene(view, handlers) {
 
     list.appendChild(li);
   });
-  main.appendChild(list);
+  scene.appendChild(list);
 
   // панель тяг (debug)
-  main.appendChild(pullPanel(debug));
+  scene.appendChild(pullPanel(debug));
 
   // заметки отладчика
-  main.appendChild(noteBox(code, view));
-
-  grid.appendChild(main);
-  scene.appendChild(grid);
+  scene.appendChild(noteBox(code, view));
 
   // заменить содержимое
   app.innerHTML = '';
