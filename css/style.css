@@ -161,6 +161,48 @@ body {
   text-transform: uppercase;
 }
 
+/* ---------- Стартовая страница ---------- */
+.start-screen {
+  max-width: 880px;
+  margin: 0 auto;
+  padding-top: 26px;
+}
+.start-screen .scene-img-wrap {
+  aspect-ratio: 3 / 2;
+  margin-bottom: 0;
+  border-radius: 5px 5px 0 0;
+}
+.start-box {
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  background: var(--paper2);
+  text-align: center;
+  padding: 30px 36px 34px;
+}
+.start-title {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.start-subtitle {
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0 0 24px;
+}
+.start-btn {
+  font-size: 18px;
+  padding: 12px 42px;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 767px) {
+  .start-screen { padding-top: 12px; }
+  .start-screen .scene-img-wrap { aspect-ratio: 4 / 5; }
+  .start-title { font-size: 26px; }
+  .start-box { padding: 22px 18px 26px; }
+}
+
 /* ---------- Объединительная рамка эпизода (картинка + текст + выборы) ---------- */
 .episode {
   border: 1px solid var(--line);

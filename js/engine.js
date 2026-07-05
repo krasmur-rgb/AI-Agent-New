@@ -4,7 +4,7 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, showResolution, showFinale } from './render.js?v=3';
+import { renderScene, renderStart, showResolution, showFinale } from './render.js?v=6';
 import { wireDumpModal } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
@@ -116,6 +116,16 @@ function debugTextLine() {
 function start() {
   resetState();
   enterAct(0);
+}
+
+/* ---------- стартовая страница ---------- */
+function showStartScreen() {
+  renderStart({
+    title: (DATA.meta && DATA.meta.title) || 'Анна Каренина',
+    subtitle: (DATA.meta && DATA.meta.subtitle) || '',
+    imageBase: 'main',            // img/desktop/main.jpg · img/mobile/main.jpg
+    onStart: start,
+  });
 }
 
 function enterAct(i) {
@@ -230,7 +240,7 @@ function showFinaleScreen() {
     finale,
     rule: DATA.rule || '',
     debugText: 'ФИНАЛ ' + lead + ' · ' + debugTextLine(),
-    onRestart: start,
+    onRestart: showStartScreen,
   });
 }
 
@@ -276,7 +286,7 @@ async function init() {
     if (DATA.meta.title) document.title = DATA.meta.title + ' · интерактивная драма';
   }
 
-  start();
+  showStartScreen();
 }
 
 init();

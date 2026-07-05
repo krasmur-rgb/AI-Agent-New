@@ -48,6 +48,32 @@ function fmtVec(vec, rivers) {
 }
 
 /* ============================================================
+   Стартовая страница
+   ============================================================ */
+export function renderStart(view) {
+  const { title, subtitle, imageBase, onStart } = view;
+
+  const wrap = el('div', 'start-screen');
+  wrap.appendChild(imageBlock(imageBase, 'Анна Каренина'));
+
+  const box = el('div', 'start-box');
+  box.appendChild(txtEl('h1', 'start-title', title));
+  if (subtitle) box.appendChild(txtEl('p', 'start-subtitle', subtitle));
+
+  const btn = el('button', 'btn btn-primary start-btn');
+  btn.type = 'button';
+  btn.textContent = 'Начать историю';
+  btn.addEventListener('click', onStart);
+  box.appendChild(btn);
+
+  wrap.appendChild(box);
+
+  app.innerHTML = '';
+  app.appendChild(wrap);
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+/* ============================================================
    Отрисовка сцены
    ============================================================ */
 export function renderScene(view, handlers) {
