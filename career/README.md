@@ -34,6 +34,7 @@ career/
 | `cover-letter` | Сопроводительное письмо / отклик под вакансию | Вместе с откликом |
 | `job-search-strategy` | Стратегия поиска: каналы, воронка, план на неделю | В начале поиска и еженедельно |
 | `interview-prep` | Банк историй STAR+Reflection, подготовка и разбор интервью | С первого приглашения |
+| `interview-coach` | Тренажёр: мок-интервью, дриллы, скоринг ответов, разбор транскриптов ([noamseg/interview-coach-skill](https://github.com/noamseg/interview-coach-skill), MIT) | Глубокая практика между interview-prep и реальным интервью |
 | `offer-negotiation` | Оценка оффера (total comp), сравнение, контр-оффер | Вилка — до скринингов; остальное — при оффере |
 
 ## Порядок работы (happy path)
