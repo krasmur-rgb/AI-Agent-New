@@ -5,6 +5,7 @@
    ============================================================ */
 
 import { getNote, setNote, openDump } from './comments.js?v=3';
+import { tryAutoplay, toggle as toggleMusic, isPlaying, fadeOutAndStop } from './audio.js?v=1';
 
 const app = document.getElementById('app');
 
@@ -69,9 +70,24 @@ export function renderStart(view) {
   const btn = el('button', 'btn btn-primary start-btn');
   btn.type = 'button';
   btn.textContent = buttonLabel || 'Начать';
-  btn.addEventListener('click', onStart);
+  btn.addEventListener('click', () => {
+    fadeOutAndStop(1200);   // музыка заставки плавно гаснет
+    onStart();
+  });
   cta.appendChild(btn);
   hero.appendChild(cta);
+
+  // музыка заставки: кнопка в верхнем правом углу картинки
+  const musicBtn = el('button', 'start-music');
+  musicBtn.type = 'button';
+  musicBtn.title = 'Музыка';
+  const setIcon = (on) => { musicBtn.textContent = on ? '🔊' : '🔇'; musicBtn.classList.toggle('on', on); };
+  setIcon(isPlaying());
+  musicBtn.addEventListener('click', () => { toggleMusic().then(setIcon); });
+  hero.appendChild(musicBtn);
+  // пробуем автозапуск (если браузер разрешает) — иначе остаётся кнопка
+  tryAutoplay().then(setIcon);
+
   wrap.appendChild(hero);
 
   const box = el('div', 'start-box');
