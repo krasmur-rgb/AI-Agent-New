@@ -183,11 +183,23 @@ export function renderScene(view, handlers) {
 
     const btn = el('button', 'choice-btn');
     btn.type = 'button';
-    btn.appendChild(txtEl('span', 'choice-tag', ch.tag));
+    const tagSpan = txtEl('span', 'choice-tag', ch.tag);
+    btn.appendChild(tagSpan);
     const htmlSpan = el('span', 'choice-html');
     htmlSpan.innerHTML = ch.html;
     btn.appendChild(htmlSpan);
-    btn.addEventListener('click', () => handlers.onChoice(i));
+
+    if (view.readOnly) {
+      // просмотр открытого эпизода: выбор сделан и изменению не подлежит
+      btn.disabled = true;
+      li.classList.add('locked');
+      if (i === view.chosenIdx) {
+        li.classList.add('chosen');
+        tagSpan.appendChild(txtEl('span', 'chosen-mark', '✓ выбор сделан'));
+      }
+    } else {
+      btn.addEventListener('click', () => handlers.onChoice(i));
+    }
     li.appendChild(btn);
 
     // служебная строка выбора (debug)
@@ -372,6 +384,44 @@ export function showFinale(view) {
 
   app.appendChild(wrap);
   window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+/* ============================================================
+   Навигация по ОТКРЫТЫМ актам и эпизодам.
+   Неоткрытых в списке нет вовсе — пользователь их не видит.
+   ============================================================ */
+export function showNavigation(groups, onPick) {
+  const overlay = el('div', 'modal-overlay nav-overlay');
+  const modal = el('div', 'modal nav-modal');
+  modal.appendChild(txtEl('h2', 'modal-h', 'Навигация'));
+
+  groups.forEach((g) => {
+    const sec = el('div', 'nav-act');
+    sec.appendChild(txtEl('div', 'nav-act-title', g.num + ' · ' + g.title));
+    const eps = el('div', 'nav-eps');
+    g.episodes.forEach((ep, i) => {
+      const b = el('button', 'nav-ep' + (ep.current ? ' current' : ''));
+      b.type = 'button';
+      b.appendChild(txtEl('span', 'nav-ep-code', 'Эпизод ' + (i + 1) + ' · ' + ep.code));
+      b.appendChild(txtEl('span', 'nav-ep-sub', ep.current ? 'вы здесь' : (ep.tag || '')));
+      b.addEventListener('click', () => { overlay.remove(); onPick(ep.code); });
+      eps.appendChild(b);
+    });
+    sec.appendChild(eps);
+    modal.appendChild(sec);
+  });
+
+  const actions = el('div', 'modal-actions');
+  const closeBtn = el('button', 'btn');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Закрыть';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  actions.appendChild(closeBtn);
+  modal.appendChild(actions);
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
 }
 
 /* ---------- служебная строка модалки/финала ---------- */

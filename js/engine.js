@@ -4,7 +4,7 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, renderStart, showResolution, showFinale } from './render.js?v=14';
+import { renderScene, renderStart, showResolution, showFinale, showNavigation } from './render.js?v=15';
 import { wireDumpModal } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
@@ -24,6 +24,8 @@ let RIVER_ORDER = ['L', 'C', 'R', 'F', 'X'];
 /* ---------- состояние прохождения ---------- */
 let pull, dead, movesLog, actNatures, path, visitedOrder;
 let actPos, sceneList, scenePos, currentAct, currentBranch;
+let sceneRegistry;    // code -> снимок открытой сцены (для навигации/просмотра)
+let answeredChoice;   // code -> индекс сделанного выбора (зафиксирован навсегда)
 
 function resetState() {
   pull = { L: 0, C: 0, R: 0, F: 0, X: 0 };
@@ -37,6 +39,8 @@ function resetState() {
   scenePos = 0;
   currentAct = null;
   currentBranch = null;
+  sceneRegistry = {};
+  answeredChoice = {};
 }
 
 /* ============================================================
@@ -155,30 +159,89 @@ function enterAct(i) {
 
 function showScene() {
   const scene = sceneList[scenePos];
-  visitedOrder.push(scene.code);
 
-  // текст: V.1 берёт прозу по руслу-лидеру (SPEC §4)
-  let proseHtml = scene.prose;
-  if (scene.proseByRiver) {
-    proseHtml = scene.proseByRiver[leader()] || scene.proseByRiver.L || '';
+  // регистрируем сцену как «открытую» только при первом показе
+  if (!sceneRegistry[scene.code]) {
+    // текст: V.1 берёт прозу по руслу-лидеру (SPEC §4) — снимок на момент открытия
+    let proseHtml = scene.prose;
+    if (scene.proseByRiver) {
+      proseHtml = scene.proseByRiver[leader()] || scene.proseByRiver.L || '';
+    }
+    visitedOrder.push(scene.code);
+    sceneRegistry[scene.code] = {
+      scene,
+      proseHtml,
+      imageBase: imageBaseFor(scene.code, currentBranch),
+      actNum: currentAct.num,
+      actTitle: currentAct.title,
+      actQ: currentAct.q,
+    };
   }
+  renderSceneEntry(sceneRegistry[scene.code], false);
+}
 
+/* Отрисовка открытой сцены: живой (frontier) или в режиме просмотра —
+   выбор уже сделан и изменить его нельзя. */
+function renderSceneEntry(entry, readOnly) {
+  const scene = entry.scene;
   const view = {
-    // шапка акта видна на каждой сцене
-    actHeader: { num: currentAct.num, title: currentAct.title, q: currentAct.q },
+    actHeader: { num: entry.actNum, title: entry.actTitle, q: entry.actQ },
     code: scene.code,
-    proseHtml,
+    proseHtml: entry.proseHtml,
     choices: scene.choices,
-    imageBase: imageBaseFor(scene.code, currentBranch),
+    imageBase: entry.imageBase,
     debug: debugSnapshot(),
     orderedCodes: visitedOrder.slice(),
     pathList: path.slice(),
+    readOnly,
+    chosenIdx: answeredChoice[scene.code],
   };
+  renderScene(view, {
+    onChoice: readOnly ? () => {} : (idx) => onChoice(scene, idx),
+  });
+}
 
-  renderScene(view, { onChoice: (idx) => onChoice(scene, idx) });
+/* Текущая «живая» сцена — последняя открытая, выбор в ней ещё не сделан. */
+function isFrontier(code) {
+  return !!(sceneList && sceneList[scenePos] && sceneList[scenePos].code === code
+    && answeredChoice[code] === undefined);
+}
+
+/* Переход по навигации: frontier рисуем живьём, остальные — просмотр. */
+function goToScene(code) {
+  const entry = sceneRegistry[code];
+  if (!entry) return;
+  if (isFrontier(code)) showScene();
+  else renderSceneEntry(entry, true);
+}
+
+/* Данные для окна навигации: ТОЛЬКО открытые акты и эпизоды,
+   по порядку открытия. Неоткрытое не показываем вовсе. */
+function navData() {
+  const groups = [];
+  const byAct = {};
+  visitedOrder.forEach((code) => {
+    const e = sceneRegistry[code];
+    if (!e) return;
+    if (!byAct[e.actNum]) {
+      byAct[e.actNum] = { num: e.actNum, title: e.actTitle, episodes: [] };
+      groups.push(byAct[e.actNum]);
+    }
+    const ansIdx = answeredChoice[code];
+    byAct[e.actNum].episodes.push({
+      code,
+      tag: ansIdx !== undefined ? e.scene.choices[ansIdx].tag : null,
+      current: isFrontier(code),
+    });
+  });
+  return groups;
 }
 
 function onChoice(scene, idx) {
+  // выбор фиксируется навсегда — повторное нажатие невозможно
+  if (answeredChoice[scene.code] !== undefined) return;
+  answeredChoice[scene.code] = idx;
+
   const choice = scene.choices[idx];
 
   // 1) закрыть финалы
@@ -265,9 +328,18 @@ function wireHomeButton() {
   document.getElementById('btn-home').addEventListener('click', showStartScreen);
 }
 
+/* «Навигация»: переключение между ОТКРЫТЫМИ актами и эпизодами. */
+function wireNavButton() {
+  document.getElementById('btn-nav').addEventListener('click', () => {
+    if (!visitedOrder || !visitedOrder.length) return;
+    showNavigation(navData(), goToScene);
+  });
+}
+
 async function init() {
   wireDebugToggle();
   wireHomeButton();
+  wireNavButton();
   wireDumpModal();
 
   try {

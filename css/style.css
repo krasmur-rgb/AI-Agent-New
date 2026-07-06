@@ -439,6 +439,54 @@ body.on-start #topbar { display: none; }
 }
 .choice-html { display: block; }
 
+/* Просмотр открытого эпизода: выбор зафиксирован */
+.choice.locked .choice-btn { cursor: default; }
+.choice.locked { opacity: 0.72; }
+.choice.locked:hover { filter: none; border-color: var(--line); }
+.choice.locked.chosen { opacity: 1; box-shadow: inset 0 0 0 2px var(--accent); }
+.chosen-mark {
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* Окно навигации по открытым актам/эпизодам */
+.nav-modal { max-width: 620px; }
+.nav-act { margin: 0 0 16px; }
+.nav-act-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 8px;
+}
+.nav-eps { display: flex; flex-wrap: wrap; gap: 8px; }
+.nav-ep {
+  font-family: var(--serif);
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper2);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.nav-ep:hover { border-color: var(--accent); }
+.nav-ep.current { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.nav-ep-code { display: block; font-size: 14px; font-weight: 700; color: var(--ink); }
+.nav-ep-sub {
+  display: block;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-soft);
+  max-width: 200px;
+}
+.nav-ep.current .nav-ep-sub { color: var(--accent); }
+
 /* Служебная строка выбора (debug) */
 .choice-dbg {
   display: none;
