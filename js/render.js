@@ -5,7 +5,7 @@
    ============================================================ */
 
 import { getNote, setNote, openDump } from './comments.js?v=3';
-import { tryAutoplay, toggle as toggleMusic, isPlaying, fadeOutAndStop } from './audio.js?v=1';
+import { tryAutoplay, toggle as toggleMusic, isPlaying, duckToBackground, fadeOutAndStop } from './audio.js?v=2';
 
 const app = document.getElementById('app');
 
@@ -71,7 +71,7 @@ export function renderStart(view) {
   btn.type = 'button';
   btn.textContent = buttonLabel || 'Начать';
   btn.addEventListener('click', () => {
-    fadeOutAndStop(1200);   // музыка заставки плавно гаснет
+    duckToBackground(1200);   // музыка продолжается в I.1, но тише — фоном
     onStart();
   });
   cta.appendChild(btn);
@@ -113,6 +113,9 @@ export function renderStart(view) {
 export function renderScene(view, handlers) {
   document.body.classList.remove('on-start');
   const { actHeader, code, proseHtml, choices, imageBase, debug } = view;
+
+  // музыка заставки звучит фоном только в первом эпизоде; дальше — гаснет
+  if (code !== 'I.1') fadeOutAndStop(1500);
 
   const scene = el('div', 'scene');
 
@@ -268,10 +271,11 @@ function noteBox(code, view) {
 /* ============================================================
    Модальное окно развязки акта
    ============================================================ */
-export function showResolution(res, onContinue) {
+export function showResolution(res, onContinue, onHome) {
   const body = document.getElementById('modal-body');
   const overlay = document.getElementById('modal-overlay');
   const btn = document.getElementById('modal-continue');
+  const homeBtn = document.getElementById('modal-home');
 
   const frag = document.createDocumentFragment();
   frag.appendChild(txtEl('div', 'res-kicker', res.kicker));         // "Развязка · Акт I"
@@ -298,12 +302,15 @@ export function showResolution(res, onContinue) {
   btn.textContent = 'Дальше';
   overlay.hidden = false;
 
-  const handler = () => {
+  const cleanup = () => {
     overlay.hidden = true;
-    btn.removeEventListener('click', handler);
-    onContinue();
+    btn.removeEventListener('click', contHandler);
+    homeBtn.removeEventListener('click', homeHandler);
   };
-  btn.addEventListener('click', handler);
+  const contHandler = () => { cleanup(); onContinue(); };
+  const homeHandler = () => { cleanup(); if (onHome) onHome(); };
+  btn.addEventListener('click', contHandler);
+  homeBtn.addEventListener('click', homeHandler);
 }
 
 /* ============================================================

@@ -4,7 +4,7 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, renderStart, showResolution, showFinale } from './render.js?v=12';
+import { renderScene, renderStart, showResolution, showFinale } from './render.js?v=13';
 import { wireDumpModal } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
@@ -211,7 +211,7 @@ function endAct() {
   }
   // Акты I–IV → развязка, затем следующий акт
   const res = computeResolution();
-  showResolution(res, () => enterAct(actPos + 1));
+  showResolution(res, () => enterAct(actPos + 1), showStartScreen);
 }
 
 /* ---------- сила развязки акта (SPEC §4) ---------- */
@@ -259,8 +259,15 @@ function wireDebugToggle() {
   apply(); // по умолчанию checked → body.debug включён (SPEC §6)
 }
 
+/* «На главную» в шапке: сброс прохождения, возврат на стартовый экран.
+   Шапка скрыта на старте, так что кнопка видна только в игре. */
+function wireHomeButton() {
+  document.getElementById('btn-home').addEventListener('click', showStartScreen);
+}
+
 async function init() {
   wireDebugToggle();
+  wireHomeButton();
   wireDumpModal();
 
   try {

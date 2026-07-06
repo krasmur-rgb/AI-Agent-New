@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Анна Каренина · интерактивная драма</title>
-  <link rel="stylesheet" href="css/style.css?v=12">
+  <link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body class="debug">
   <header id="topbar">
@@ -13,10 +13,13 @@
         <span id="doc-title">Анна Каренина</span>
         <span id="doc-subtitle" class="doc-subtitle"></span>
       </div>
-      <label class="dbg-toggle" title="Служебный слой отладки">
-        <input type="checkbox" id="debug-checkbox" checked>
-        <span>режим отладки</span>
-      </label>
+      <div class="topbar-actions">
+        <button id="btn-home" class="btn btn-small home-btn" type="button">На главную</button>
+        <label class="dbg-toggle" title="Служебный слой отладки">
+          <input type="checkbox" id="debug-checkbox" checked>
+          <span>режим отладки</span>
+        </label>
+      </div>
     </div>
   </header>
 
@@ -29,7 +32,10 @@
   <div id="modal-overlay" class="modal-overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true">
       <div id="modal-body"></div>
-      <button id="modal-continue" class="btn btn-primary">Дальше</button>
+      <div class="modal-btns">
+        <button id="modal-home" class="btn" type="button">На главную</button>
+        <button id="modal-continue" class="btn btn-primary" type="button">Дальше</button>
+      </div>
     </div>
   </div>
 
@@ -46,6 +52,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/engine.js?v=12"></script>
+  <script type="module" src="js/engine.js?v=13"></script>
 </body>
 </html>

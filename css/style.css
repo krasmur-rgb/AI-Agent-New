@@ -68,6 +68,12 @@ body {
   color: var(--ink-soft);
   font-style: italic;
 }
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+.home-btn { white-space: nowrap; }
 .dbg-toggle {
   display: inline-flex;
   align-items: center;
@@ -606,7 +612,8 @@ body.on-start #topbar { display: none; }
 }
 
 .modal-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end; }
-#modal-continue { margin-top: 20px; }
+.modal-btns { margin-top: 20px; display: flex; gap: 10px; justify-content: space-between; }
+.modal-btns #modal-continue { margin-left: auto; }
 .dump-status { font-size: 13px; color: var(--gold); min-height: 18px; margin: 0 0 8px; }
 .dump-area {
   width: 100%;
