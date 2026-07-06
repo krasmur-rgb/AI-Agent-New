@@ -391,10 +391,30 @@ export function showFinale(view) {
    Неоткрытых в списке нет вовсе — пользователь их не видит.
    ============================================================ */
 export function showNavigation(groups, onPick) {
-  const overlay = el('div', 'modal-overlay nav-overlay');
-  const modal = el('div', 'modal nav-modal');
-  modal.appendChild(txtEl('h2', 'modal-h', 'Навигация'));
+  if (document.querySelector('.nav-drawer')) return;   // уже открыта
 
+  // панель прикреплена к правому краю, начинается под шапкой —
+  // по верхней рамке основного блока
+  const topbar = document.getElementById('topbar');
+  const topPx = topbar && getComputedStyle(topbar).display !== 'none'
+    ? Math.round(topbar.getBoundingClientRect().bottom) : 0;
+
+  const backdrop = el('div', 'nav-backdrop');
+  backdrop.style.top = topPx + 'px';
+  const drawer = el('div', 'nav-drawer');
+  drawer.style.top = topPx + 'px';
+
+  const close = () => {
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    document.removeEventListener('keydown', onEsc);
+    setTimeout(() => { drawer.remove(); backdrop.remove(); }, 280);
+  };
+  const onEsc = (e) => { if (e.key === 'Escape') close(); };
+
+  drawer.appendChild(txtEl('div', 'nav-title', 'Навигация'));
+
+  const body = el('div', 'nav-body');
   groups.forEach((g) => {
     const sec = el('div', 'nav-act');
     sec.appendChild(txtEl('div', 'nav-act-title', g.num + ' · ' + g.title));
@@ -404,24 +424,32 @@ export function showNavigation(groups, onPick) {
       b.type = 'button';
       b.appendChild(txtEl('span', 'nav-ep-code', 'Эпизод ' + (i + 1) + ' · ' + ep.code));
       b.appendChild(txtEl('span', 'nav-ep-sub', ep.current ? 'вы здесь' : (ep.tag || '')));
-      b.addEventListener('click', () => { overlay.remove(); onPick(ep.code); });
+      b.addEventListener('click', () => { close(); onPick(ep.code); });
       eps.appendChild(b);
     });
     sec.appendChild(eps);
-    modal.appendChild(sec);
+    body.appendChild(sec);
   });
+  drawer.appendChild(body);
 
-  const actions = el('div', 'modal-actions');
-  const closeBtn = el('button', 'btn');
-  closeBtn.type = 'button';
-  closeBtn.textContent = 'Закрыть';
-  closeBtn.addEventListener('click', () => overlay.remove());
-  actions.appendChild(closeBtn);
-  modal.appendChild(actions);
+  // «Отмена» — закрыть, никуда не переходя
+  const foot = el('div', 'nav-foot');
+  const cancelBtn = el('button', 'btn');
+  cancelBtn.type = 'button';
+  cancelBtn.textContent = 'Отмена';
+  cancelBtn.addEventListener('click', close);
+  foot.appendChild(cancelBtn);
+  drawer.appendChild(foot);
 
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', onEsc);
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(() => {
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+  });
 }
 
 /* ---------- служебная строка модалки/финала ---------- */

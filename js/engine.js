@@ -4,7 +4,7 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, renderStart, showResolution, showFinale, showNavigation } from './render.js?v=15';
+import { renderScene, renderStart, showResolution, showFinale, showNavigation } from './render.js?v=16';
 import { wireDumpModal } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------

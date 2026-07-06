@@ -453,8 +453,38 @@ body.on-start #topbar { display: none; }
   letter-spacing: 0.06em;
 }
 
-/* Окно навигации по открытым актам/эпизодам */
-.nav-modal { max-width: 620px; }
+/* Выезжающая панель навигации у правого края (под шапкой) */
+.nav-backdrop {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(24,20,15,0.22);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 45;
+}
+.nav-backdrop.open { opacity: 1; }
+.nav-drawer {
+  position: fixed;
+  right: 0; bottom: 0;
+  width: 380px;
+  max-width: 92vw;
+  background: var(--paper2);
+  border-left: 1px solid var(--line);
+  box-shadow: -14px 0 44px rgba(32,28,22,0.28);
+  transform: translateX(105%);
+  transition: transform 0.28s ease;
+  z-index: 46;
+  display: flex;
+  flex-direction: column;
+}
+.nav-drawer.open { transform: translateX(0); }
+.nav-title {
+  padding: 15px 20px 11px;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--line);
+}
+.nav-body { flex: 1; overflow-y: auto; padding: 14px 20px; }
 .nav-act { margin: 0 0 16px; }
 .nav-act-title {
   font-size: 12px;
@@ -464,14 +494,15 @@ body.on-start #topbar { display: none; }
   color: var(--gold);
   margin: 0 0 8px;
 }
-.nav-eps { display: flex; flex-wrap: wrap; gap: 8px; }
+.nav-eps { display: flex; flex-direction: column; gap: 8px; }
 .nav-ep {
   font-family: var(--serif);
+  width: 100%;
   text-align: left;
   border: 1px solid var(--line);
   border-radius: 4px;
-  background: var(--paper2);
-  padding: 8px 12px;
+  background: var(--paper);
+  padding: 9px 12px;
   cursor: pointer;
   transition: border-color 0.15s;
 }
@@ -483,9 +514,14 @@ body.on-start #topbar { display: none; }
   font-size: 12px;
   font-style: italic;
   color: var(--ink-soft);
-  max-width: 200px;
 }
 .nav-ep.current .nav-ep-sub { color: var(--accent); }
+.nav-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+}
 
 /* Служебная строка выбора (debug) */
 .choice-dbg {
