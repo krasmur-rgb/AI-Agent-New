@@ -168,6 +168,57 @@ body {
   text-transform: uppercase;
 }
 
+/* ---------- Занавес первого запуска ---------- */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* мутное стекло в тёплой бумажной гамме + мягкие вертикальные складки */
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,252,240,0.07) 0px,
+      rgba(64,56,44,0.06) 70px,
+      rgba(255,252,240,0.07) 140px),
+    linear-gradient(165deg,
+      rgba(232,224,205,0.55) 0%,
+      rgba(224,215,191,0.42) 45%,
+      rgba(196,184,156,0.52) 100%);
+  -webkit-backdrop-filter: blur(16px) saturate(0.9);
+  backdrop-filter: blur(16px) saturate(0.9);
+  transition: transform 1s cubic-bezier(0.6, 0.05, 0.8, 0.4), opacity 1s ease;
+  will-change: transform, opacity;
+}
+.curtain.falling {
+  transform: translateY(102%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+/* большая кнопка в графике проекта: бумага, засечки, бордовый, книжная рамка */
+.curtain-btn {
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--paper);
+  background: var(--accent);
+  border: 1px solid rgba(240,232,212,0.55);
+  outline: 1px solid var(--accent);
+  outline-offset: 5px;
+  border-radius: 4px;
+  padding: 20px 78px;
+  cursor: pointer;
+  box-shadow: 0 14px 48px rgba(32,28,22,0.4);
+  transition: background 0.15s, transform 0.1s;
+}
+.curtain-btn:hover { background: #7a3232; }
+.curtain-btn:active { transform: translateY(1px); }
+@media (max-width: 767px) {
+  .curtain-btn { font-size: 21px; padding: 16px 52px; }
+}
+
 /* ---------- Стартовая страница ---------- */
 /* во всю ширину экрана (выходим за пределы контейнера #app)
    и ровно в один экран по высоте: картинка занимает всё свободное место */

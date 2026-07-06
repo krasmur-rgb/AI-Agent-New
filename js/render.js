@@ -51,6 +51,24 @@ function fmtVec(vec, rivers) {
 /* ============================================================
    Стартовая страница
    ============================================================ */
+// Занавес первого запуска: показывается один раз за загрузку страницы
+// (в памяти, без localStorage). Клик по нему — жест пользователя,
+// поэтому именно здесь браузер разрешает запуск музыки.
+let curtainDone = false;
+
+function buildCurtain(onOpen) {
+  const c = el('div', 'curtain');
+  const btn = el('button', 'curtain-btn');
+  btn.type = 'button';
+  btn.textContent = 'Начать';
+  btn.addEventListener('click', () => {
+    onOpen();                          // музыка стартует на жесте
+    c.classList.add('falling');        // занавес падает
+    setTimeout(() => c.remove(), 1100);
+  }, { once: true });
+  c.appendChild(btn);
+  return c;
+}
 export function renderStart(view) {
   const { title, subtitle, intro, buttonLabel, imageBase, onStart } = view;
 
@@ -85,8 +103,16 @@ export function renderStart(view) {
   setIcon(isPlaying());
   musicBtn.addEventListener('click', () => { toggleMusic().then(setIcon); });
   hero.appendChild(musicBtn);
-  // пробуем автозапуск (если браузер разрешает) — иначе остаётся кнопка
-  tryAutoplay().then(setIcon);
+
+  if (curtainDone) {
+    // повторный визит на главную: музыка включается сама (если не выключали)
+    tryAutoplay().then(setIcon);
+  } else {
+    // первый запуск: за прозрачным занавесом; музыка стартует по клику
+    curtainDone = true;
+    const curtain = buildCurtain(() => { tryAutoplay().then(setIcon); });
+    document.body.appendChild(curtain);
+  }
 
   wrap.appendChild(hero);
 
