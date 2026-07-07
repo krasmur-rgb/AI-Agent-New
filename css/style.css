@@ -47,8 +47,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* ---------- Верхняя панель ---------- */
-#topbar {
+/* ---------- Верхняя панель ----------
+   Скрыта навсегда: служит парковкой для служебных кнопок между
+   перерисовками; на сценах кнопки встают в строку заголовка акта. */
+#topbar { display: none; }
+#topbar-legacy {
   position: sticky;
   top: 0;
   z-index: 20;
@@ -119,9 +122,26 @@ body:not(.debug) #app { padding-bottom: 20px; }
 .scene-text { min-width: 0; }
 
 .act-head {
+  position: relative;
   margin: 2px 0 14px;
   padding-bottom: 9px;
+  padding-right: 240px;   /* место под кнопки справа */
   border-bottom: 1px solid var(--line);
+}
+/* Навигация / На главную — в строке заголовка акта, правый угол */
+.head-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.act-head .head-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.head-actions-static {
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
 .act-num {
   font-size: 14px;
@@ -894,18 +914,14 @@ body.debug .note-box { display: block; }
   body { font-size: 18px; }
   #app { padding: 0 14px 60px; }
   body:not(.debug) #app { padding-bottom: 16px; }
-  /* компактная шапка: один ряд, без подзаголовка */
-  .topbar-inner { padding: 8px 12px; gap: 10px; align-items: center; }
-  .doc-subtitle { display: none; }
-  #doc-title {
-    font-size: 14px;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  /* кнопки — строкой над заголовком акта, прижаты вправо */
+  .act-head { padding-right: 0; }
+  .act-head .head-actions {
+    position: static;
+    justify-content: flex-end;
+    margin-bottom: 6px;
   }
-  .topbar-actions { gap: 8px; }
-  .topbar-actions .btn-small { font-size: 12px; padding: 5px 9px; }
+  .head-actions .btn-small { font-size: 12px; padding: 5px 9px; }
   .scene-img-wrap { aspect-ratio: 4 / 5; }  /* вертикальный кроп */
   .prose { font-size: 19px; }
   .act-title { font-size: 24px; }

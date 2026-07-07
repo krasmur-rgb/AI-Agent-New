@@ -9,6 +9,31 @@ import { tryAutoplay, toggle as toggleMusic, isPlaying, duckToBackground, fadeOu
 
 const app = document.getElementById('app');
 
+/* ---------- служебные кнопки (Навигация / На главную / отладка) ----------
+   Живут как постоянные узлы с обработчиками; между перерисовками
+   паркуются в скрытую шапку, на сценах встают в строку заголовка акта. */
+function parkChrome() {
+  const park = document.querySelector('.topbar-actions');
+  if (!park) return;
+  ['btn-nav', 'btn-home'].forEach((id) => {
+    const n = document.getElementById(id);
+    if (n) park.appendChild(n);
+  });
+  const t = document.querySelector('.dbg-toggle');
+  if (t) park.appendChild(t);
+}
+
+function chromeRow(extraClass) {
+  const row = el('div', 'head-actions' + (extraClass ? ' ' + extraClass : ''));
+  const nav = document.getElementById('btn-nav');
+  const home = document.getElementById('btn-home');
+  const dbg = document.querySelector('.dbg-toggle');
+  if (nav) row.appendChild(nav);
+  if (home) row.appendChild(home);
+  if (dbg) row.appendChild(dbg);
+  return row;
+}
+
 /* ---------- утилиты картинки ---------- */
 // basename без расширения → блок картинки с заглушкой
 function imageBlock(imageBase, code) {
@@ -73,6 +98,7 @@ export function renderStart(view) {
   const { title, subtitle, intro, buttonLabel, imageBase, onStart } = view;
 
   document.body.classList.add('on-start');   // прячем шапку сайта: заголовок живёт на картинке
+  parkChrome();   // кнопки сцен на старте не нужны — паркуем до входа в игру
   const wrap = el('div', 'start-screen');
 
   // картинка во всю ширину; заголовок — на картинке в верхнем левом углу,
@@ -153,6 +179,7 @@ export function renderStart(view) {
    ============================================================ */
 export function renderScene(view, handlers) {
   document.body.classList.remove('on-start');
+  parkChrome();   // спасаем служебные кнопки из прежнего DOM
   const { actHeader, code, proseHtml, choices, imageBase, debug } = view;
 
   // музыка заставки звучит фоном только в первом эпизоде; дальше — гаснет
@@ -160,9 +187,10 @@ export function renderScene(view, handlers) {
 
   const scene = el('div', 'scene');
 
-  // заголовок акта (только на первой сцене акта)
+  // заголовок акта; справа в этой же строке — Навигация / На главную
   if (actHeader) {
     const head = el('div', 'act-head');
+    head.appendChild(chromeRow());
     head.appendChild(txtEl('div', 'act-num', actHeader.num));
     head.appendChild(txtEl('div', 'act-title', actHeader.title));
     if (actHeader.q) head.appendChild(txtEl('div', 'act-q', actHeader.q));
@@ -382,10 +410,12 @@ export function showResolution(res, onContinue, onHome) {
    ============================================================ */
 export function showFinale(view) {
   document.body.classList.remove('on-start');
+  parkChrome();
   const { finale, rule, debugText, onRestart } = view;
   app.innerHTML = '';
 
   const wrap = el('div', 'scene finale');
+  wrap.appendChild(chromeRow('head-actions-static'));
   wrap.appendChild(txtEl('div', 'finale-kicker', 'Финал'));
   wrap.appendChild(txtEl('div', 'finale-name', finale.name));
   wrap.appendChild(txtEl('p', 'finale-paid', 'Заплачено: ' + finale.paid));
