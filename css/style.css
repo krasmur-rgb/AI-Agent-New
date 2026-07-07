@@ -380,14 +380,8 @@ body.on-start #topbar { display: none; }
     backdrop-filter: none;
     border-bottom-right-radius: 0;
   }
-  /* мобильный: без главного титула — остаётся только подзаголовок,
-     крупно, цветом кнопки «Начать» */
-  .start-hero-overlay .start-title { display: none; }
-  .start-hero-overlay .start-subtitle {
-    font-size: 22px;               /* 11px ×2 */
-    color: var(--accent);
-    text-shadow: 0 1px 5px rgba(255,255,255,0.5);
-  }
+  /* мобильный: на картинке нет никаких надписей — чистый кадр */
+  .start-hero-overlay { display: none; }
   .start-intro { font-size: 14.5px; line-height: 1.45; }
   .start-box { padding: 12px 14px 14px; }
 }
