@@ -383,8 +383,11 @@ body.on-start #topbar { display: none; }
   .start-hero-overlay .start-title {
     font-size: 13px;               /* 19px −30% */
     white-space: normal;
-    text-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    color: var(--gold);            /* как заголовок «Зачем это» */
+    text-shadow: 0 1px 4px rgba(255,255,255,0.45);
   }
+  /* заголовок в две строки — по строке на спан из JSON */
+  .start-hero-overlay .start-title .title-line { display: block; }
   .start-hero-overlay .start-subtitle {
     font-size: 11px;
     text-shadow: 0 1px 4px rgba(0,0,0,0.6);

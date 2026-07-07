@@ -106,7 +106,17 @@ export function renderStart(view) {
   const hero = imageBlock(imageBase, 'Анна Каренина');
 
   const overlay = el('div', 'start-hero-overlay');
-  overlay.appendChild(txtEl('h1', 'start-title', title));
+  const h1 = el('h1', 'start-title');
+  if (view.titleLines && view.titleLines.length > 1) {
+    // строки из JSON: на десктопе — одна строка, на мобильном — по строке на спан
+    view.titleLines.forEach((line, i) => {
+      if (i > 0) h1.appendChild(document.createTextNode(' '));
+      h1.appendChild(txtEl('span', 'title-line', line));
+    });
+  } else {
+    h1.textContent = title;
+  }
+  overlay.appendChild(h1);
   if (subtitle) overlay.appendChild(txtEl('p', 'start-subtitle', subtitle));
   hero.appendChild(overlay);
 

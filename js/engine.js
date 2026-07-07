@@ -4,7 +4,7 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, renderStart, showResolution, showFinale, showNavigation, showConfirm } from './render.js?v=19';
+import { renderScene, renderStart, showResolution, showFinale, showNavigation, showConfirm } from './render.js?v=20';
 import { wireDumpModal, noteCount } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
@@ -133,6 +133,7 @@ function showStartScreen() {
   const st = meta.start || {};
   renderStart({
     title: meta.title || 'Анна Каренина',
+    titleLines: st.titleLines || null,
     subtitle: st.subtitle || meta.subtitle || '',
     introTitle: st.introTitle || '',
     intro: st.intro || [],
@@ -395,7 +396,7 @@ async function init() {
   wireDumpModal();
 
   try {
-    const resp = await fetch('data/scenario_data.json?v=10');
+    const resp = await fetch('data/scenario_data.json?v=24');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     DATA = await resp.json();
   } catch (e) {
