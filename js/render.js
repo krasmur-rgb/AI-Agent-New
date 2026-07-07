@@ -5,7 +5,7 @@
    ============================================================ */
 
 import { getNote, setNote, openDump } from './comments.js?v=3';
-import { tryAutoplay, toggle as toggleMusic, isPlaying, duckToBackground, fadeOutAndStop } from './audio.js?v=2';
+import { tryAutoplay, toggle as toggleMusic, isPlaying, duckToBackground, fadeOutAndStop } from './audio.js?v=3';
 
 const app = document.getElementById('app');
 
