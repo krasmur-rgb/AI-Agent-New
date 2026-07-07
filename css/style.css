@@ -246,24 +246,26 @@ body.on-start #topbar { display: none; }
   top: 0;
   left: 0;
   z-index: 2;
-  max-width: min(560px, 72%);
-  background: linear-gradient(160deg, rgba(43,38,31,0.72), rgba(58,52,42,0.58));
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  max-width: none;
+  /* светлая пелена в тон пара/снега на кадре, полупрозрачная */
+  background: linear-gradient(160deg, rgba(236,233,228,0.42), rgba(222,219,213,0.30));
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   border-bottom-right-radius: 6px;
-  padding: 16px 26px 14px 40px;
+  padding: 16px 30px 13px 40px;
 }
 .start-hero-overlay .start-title {
-  font-size: 27px;
+  font-size: 31px;
   font-weight: 700;
   margin: 0 0 3px;
-  color: #f0e8d4;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  white-space: nowrap;            /* заголовок в одну строку */
+  color: var(--ink);
+  text-shadow: 0 1px 6px rgba(236,233,228,0.55);
 }
 .start-hero-overlay .start-subtitle {
-  font-size: 14.5px;
+  font-size: 15px;
   font-style: italic;
-  color: rgba(240,232,212,0.85);
+  color: rgba(32,28,22,0.78);
   margin: 0;
 }
 /* кнопка музыки заставки — верхний правый угол картинки */
@@ -338,8 +340,8 @@ body.on-start #topbar { display: none; }
   .start-screen { height: 100dvh; margin-bottom: -60px; }
   .start-cta { left: 16px; bottom: 18px; }
   .start-btn { font-size: 16px; padding: 10px 26px; }
-  .start-hero-overlay { max-width: 88%; padding: 10px 16px 9px 16px; }
-  .start-hero-overlay .start-title { font-size: 19px; }
+  .start-hero-overlay { max-width: 92%; padding: 10px 16px 9px 16px; }
+  .start-hero-overlay .start-title { font-size: 19px; white-space: normal; }
   .start-hero-overlay .start-subtitle { font-size: 12.5px; }
   .start-intro { font-size: 14.5px; line-height: 1.45; }
   .start-box { padding: 12px 14px 14px; }
