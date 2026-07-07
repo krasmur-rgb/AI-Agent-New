@@ -12,7 +12,8 @@ workspace/
 .env
 
 # career agent: личные данные не коммитятся (шаблоны и методология — коммитятся)
-career/profile/profile.md
+career/profile/*
+!career/profile/TEMPLATE.md
 career/resumes/
 career/search/
 career/interview/
