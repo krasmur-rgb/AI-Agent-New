@@ -371,9 +371,24 @@ body.on-start #topbar { display: none; }
   .start-screen { height: 100dvh; margin-bottom: -60px; }
   .start-cta { left: 16px; bottom: 18px; }
   .start-btn { font-size: 16px; padding: 10px 26px; }
-  .start-hero-overlay { max-width: 92%; padding: 10px 16px 9px 16px; }
-  .start-hero-overlay .start-title { font-size: 19px; white-space: normal; }
-  .start-hero-overlay .start-subtitle { font-size: 12.5px; }
+  /* мобильный: без фоновой заливки, мельче титул; тень держит читаемость */
+  .start-hero-overlay {
+    max-width: 92%;
+    padding: 10px 14px 8px 14px;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom-right-radius: 0;
+  }
+  .start-hero-overlay .start-title {
+    font-size: 13px;               /* 19px −30% */
+    white-space: normal;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.65);
+  }
+  .start-hero-overlay .start-subtitle {
+    font-size: 11px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
   .start-intro { font-size: 14.5px; line-height: 1.45; }
   .start-box { padding: 12px 14px 14px; }
 }
