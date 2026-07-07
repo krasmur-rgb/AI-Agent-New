@@ -317,8 +317,8 @@ body.on-start #topbar { display: none; }
 .start-screen .scene-img { object-position: center top; }
 
 .start-intro {
-  max-width: 70ch;               /* читаемая строка вместо ~139 знаков */
-  margin: 0 auto;
+  max-width: none;   /* во всю ширину — компактный блок, картинка выше (выбор автора) */
+  margin: 0;
   text-align: left;
   font-size: 17px;
   line-height: 1.5;
