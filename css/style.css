@@ -382,6 +382,12 @@ body.on-start #topbar { display: none; }
   }
   /* мобильный: на картинке нет никаких надписей — чистый кадр */
   .start-hero-overlay { display: none; }
+  /* кнопка звука — правый нижний угол, напротив «Начать» */
+  .start-music {
+    top: auto;
+    bottom: 18px;
+    right: 16px;
+  }
   .start-intro { font-size: 14.5px; line-height: 1.45; }
   .start-box { padding: 12px 14px 14px; }
 }
