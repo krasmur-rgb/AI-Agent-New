@@ -10,3 +10,7 @@ workspace/
 
 # env
 .env
+
+# impeccable runtime state (live-server port/pid)
+.impeccable/live/server.json
+.impeccable/critique/
