@@ -14,6 +14,17 @@ colors:
   mark: "#a8451f"
   rail: "#8a2f14"
   dbg: "#2f5560"
+  # тёмная гамма оверлеев и заглушек (осознанная, см. Overview)
+  placeholder-1: "#2a2620"
+  placeholder-2: "#3a342a"
+  placeholder-3: "#1d1a15"
+  overlay-smoke-1: "#2b261f"
+  overlay-smoke-2: "#3a342a"
+  hero-text: "#f0e8d4"
+  accent-hover: "#7a3232"
+  choice-tint-1: "#f0e9d2"
+  choice-tint-2: "#eee2d2"
+  choice-tint-3: "#e7e7d6"
 typography:
   prose:
     fontFamily: "Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif"
@@ -45,9 +56,12 @@ typography:
     fontSize: 12.5px
     fontWeight: 400
 rounded:
+  xs: 3px
   sm: 4px
   md: 5px
+  lg: 6px
   none: 0px
+  full: 50%
 components:
   episode-frame:
     border: "1px solid {colors.line}"

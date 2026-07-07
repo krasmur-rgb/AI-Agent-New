@@ -4,8 +4,8 @@
    тексты сцен в код НЕ вшиты (SPEC §1).
    ============================================================ */
 
-import { renderScene, renderStart, showResolution, showFinale, showNavigation } from './render.js?v=16';
-import { wireDumpModal } from './comments.js?v=3';
+import { renderScene, renderStart, showResolution, showFinale, showNavigation, showConfirm } from './render.js?v=17';
+import { wireDumpModal, noteCount } from './comments.js?v=3';
 
 /* ---------- ЧЕРНОВЫЕ КОНСТАНТЫ МЕХАНИКИ (SPEC §3) ----------
    Калибруются автором после пилота. Значения по умолчанию — из
@@ -26,6 +26,8 @@ let pull, dead, movesLog, actNatures, path, visitedOrder;
 let actPos, sceneList, scenePos, currentAct, currentBranch;
 let sceneRegistry;    // code -> снимок открытой сцены (для навигации/просмотра)
 let answeredChoice;   // code -> индекс сделанного выбора (зафиксирован навсегда)
+let runActive;        // прохождение начато и финал ещё не показан
+let resumeRun;        // как вернуться к текущему месту прохождения (сцена или развязка)
 
 function resetState() {
   pull = { L: 0, C: 0, R: 0, F: 0, X: 0 };
@@ -41,6 +43,8 @@ function resetState() {
   currentBranch = null;
   sceneRegistry = {};
   answeredChoice = {};
+  runActive = false;
+  resumeRun = null;
 }
 
 /* ============================================================
@@ -119,6 +123,7 @@ function debugTextLine() {
    ============================================================ */
 function start() {
   resetState();
+  runActive = true;
   enterAct(0);
 }
 
@@ -134,7 +139,24 @@ function showStartScreen() {
     buttonLabel: st.button || 'Начать историю',
     imageBase: 'main',            // img/desktop/main.jpg · img/mobile/main.jpg
     onStart: start,
+    // живое прохождение можно продолжить с текущего места
+    canContinue: !!(runActive && resumeRun),
+    continueLabel: runActive && currentAct ? 'Продолжить · ' + currentAct.num : 'Продолжить',
+    onContinue: () => { if (resumeRun) resumeRun(); },
   });
+}
+
+/* ---------- уход на главную с защитой прохождения ---------- */
+function goHomeGuarded() {
+  if (runActive && path.length > 0) {
+    showConfirm(
+      'Вы уходите из прохождения. Вернуться можно будет кнопкой «Продолжить» — пока вкладка открыта.',
+      showStartScreen,                                   // уйти
+      () => { if (resumeRun) resumeRun(); },             // остаться — вернуть текущий экран
+    );
+  } else {
+    showStartScreen();
+  }
 }
 
 function enterAct(i) {
@@ -177,6 +199,7 @@ function showScene() {
       actQ: currentAct.q,
     };
   }
+  resumeRun = showScene;   // «Продолжить» возвращает на текущую сцену
   renderSceneEntry(sceneRegistry[scene.code], false);
 }
 
@@ -196,8 +219,15 @@ function renderSceneEntry(entry, readOnly) {
     readOnly,
     chosenIdx: answeredChoice[scene.code],
   };
+  // из просмотра пройденного эпизода можно вернуться к текущему месту
+  const frontier = runActive && sceneList && sceneList[scenePos]
+    && answeredChoice[sceneList[scenePos].code] === undefined
+    ? sceneList[scenePos].code : null;
+  view.frontierCode = readOnly && frontier && frontier !== scene.code ? frontier : null;
+
   renderScene(view, {
     onChoice: readOnly ? () => {} : (idx) => onChoice(scene, idx),
+    onGoFrontier: () => { if (resumeRun) resumeRun(); },
   });
 }
 
@@ -274,7 +304,9 @@ function endAct() {
   }
   // Акты I–IV → развязка, затем следующий акт
   const res = computeResolution();
-  showResolution(res, () => enterAct(actPos + 1), showStartScreen);
+  const openResolution = () => showResolution(res, () => enterAct(actPos + 1), goHomeGuarded);
+  resumeRun = openResolution;   // «Продолжить»/«остаться» возвращает развязку
+  openResolution();
 }
 
 /* ---------- сила развязки акта (SPEC §4) ---------- */
@@ -304,6 +336,8 @@ function showFinaleScreen() {
     code: 'fin-' + lead,
     imageBase: 'fin-' + lead,            // fin-L.jpg … fin-X.jpg
   };
+  runActive = false;    // прохождение завершено — защита больше не нужна
+  resumeRun = null;
   showFinale({
     finale,
     rule: DATA.rule || '',
@@ -315,17 +349,34 @@ function showFinaleScreen() {
 /* ============================================================
    Инициализация
    ============================================================ */
+/* Служебный слой доступен только с ?debug=1 (SPEC §6: чистый режим —
+   как у конечного игрока; пилотный вход для автора — через параметр). */
 function wireDebugToggle() {
   const cb = document.getElementById('debug-checkbox');
-  const apply = () => document.body.classList.toggle('debug', cb.checked);
+  const debugAllowed = new URLSearchParams(location.search).get('debug') === '1';
+  if (debugAllowed) {
+    document.body.classList.add('debug-avail');   // показывает сам переключатель
+    cb.checked = true;
+  }
+  const apply = () => document.body.classList.toggle('debug', debugAllowed && cb.checked);
   cb.addEventListener('change', apply);
-  apply(); // по умолчанию checked → body.debug включён (SPEC §6)
+  apply();
+}
+
+/* Предупреждение при закрытии/обновлении вкладки: гибнут прохождение и заметки */
+function wireUnloadGuard() {
+  window.addEventListener('beforeunload', (e) => {
+    if ((runActive && path && path.length > 0) || noteCount() > 0) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 }
 
 /* «На главную» в шапке: сброс прохождения, возврат на стартовый экран.
    Шапка скрыта на старте, так что кнопка видна только в игре. */
 function wireHomeButton() {
-  document.getElementById('btn-home').addEventListener('click', showStartScreen);
+  document.getElementById('btn-home').addEventListener('click', goHomeGuarded);
 }
 
 /* «Навигация»: переключение между ОТКРЫТЫМИ актами и эпизодами. */
@@ -338,6 +389,7 @@ function wireNavButton() {
 
 async function init() {
   wireDebugToggle();
+  wireUnloadGuard();
   wireHomeButton();
   wireNavButton();
   wireDumpModal();

@@ -26,7 +26,7 @@ function imageBlock(imageBase, code) {
   src.srcset = `img/mobile/${imageBase}.jpg`;
   const img = document.createElement('img');
   img.className = 'scene-img';
-  img.alt = '';
+  img.alt = 'Кадр: ' + code;   // для screen reader кадр — часть сцены, не декорация
   img.decoding = 'async';
   img.src = `img/desktop/${imageBase}.jpg`;
   img.addEventListener('load', () => img.classList.add('loaded'));
@@ -60,7 +60,7 @@ function buildCurtain(onOpen) {
   const c = el('div', 'curtain');
   const btn = el('button', 'curtain-btn');
   btn.type = 'button';
-  btn.textContent = 'Начать';
+  btn.textContent = 'Поднять занавес';
   btn.addEventListener('click', () => {
     onOpen();                          // музыка стартует на жесте
     c.classList.add('falling');        // занавес падает
@@ -85,14 +85,29 @@ export function renderStart(view) {
   hero.appendChild(overlay);
 
   const cta = el('div', 'start-cta');
-  const btn = el('button', 'btn btn-primary start-btn');
-  btn.type = 'button';
-  btn.textContent = buttonLabel || 'Начать';
-  btn.addEventListener('click', () => {
-    duckToBackground(1200);   // музыка продолжается в I.1, но тише — фоном
-    onStart();
-  });
-  cta.appendChild(btn);
+  if (view.canContinue) {
+    // живое прохождение: главная кнопка — продолжить, вторая — начать заново
+    const contBtn = el('button', 'btn btn-primary start-btn');
+    contBtn.type = 'button';
+    contBtn.textContent = view.continueLabel || 'Продолжить';
+    contBtn.addEventListener('click', () => { duckToBackground(1200); view.onContinue(); });
+    cta.appendChild(contBtn);
+
+    const restartBtn = el('button', 'btn start-btn start-btn-secondary');
+    restartBtn.type = 'button';
+    restartBtn.textContent = 'Начать заново';
+    restartBtn.addEventListener('click', () => { duckToBackground(1200); onStart(); });
+    cta.appendChild(restartBtn);
+  } else {
+    const btn = el('button', 'btn btn-primary start-btn');
+    btn.type = 'button';
+    btn.textContent = buttonLabel || 'Начать';
+    btn.addEventListener('click', () => {
+      duckToBackground(1200);   // музыка продолжается в I.1, но тише — фоном
+      onStart();
+    });
+    cta.appendChild(btn);
+  }
   hero.appendChild(cta);
 
   // музыка заставки: кнопка в верхнем правом углу картинки
@@ -173,7 +188,7 @@ export function renderScene(view, handlers) {
 
   // плашка-призыв между сценой и вариантами
   const askBanner = el('div', 'ask-banner');
-  askBanner.textContent = 'Как отреагирует Анна?';
+  askBanner.textContent = view.readOnly ? 'Эпизод пройден · выбор сделан' : 'Как отреагирует Анна?';
   episode.appendChild(askBanner);
 
   // выборы
@@ -216,6 +231,17 @@ export function renderScene(view, handlers) {
   });
   episode.appendChild(list);
   scene.appendChild(episode);
+
+  // из просмотра — путь назад к текущему месту прохождения
+  if (view.readOnly && view.frontierCode) {
+    const back = el('div', 'frontier-row');
+    const backBtn = el('button', 'btn btn-small');
+    backBtn.type = 'button';
+    backBtn.textContent = '→ Вернуться к текущему эпизоду (' + view.frontierCode + ')';
+    backBtn.addEventListener('click', () => handlers.onGoFrontier());
+    back.appendChild(backBtn);
+    scene.appendChild(back);
+  }
 
   // панель тяг (debug)
   scene.appendChild(pullPanel(debug));
@@ -384,6 +410,44 @@ export function showFinale(view) {
 
   app.appendChild(wrap);
   window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+/* ============================================================
+   Подтверждение деструктивного действия (в стиле системы)
+   ============================================================ */
+export function showConfirm(message, onYes, onNo) {
+  const overlay = el('div', 'modal-overlay');
+  const modal = el('div', 'modal confirm-modal');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-label', 'Подтверждение');
+
+  modal.appendChild(txtEl('p', 'confirm-text', message));
+
+  const btns = el('div', 'modal-btns');
+  const stayBtn = el('button', 'btn btn-primary');
+  stayBtn.type = 'button';
+  stayBtn.textContent = 'Остаться';
+  const leaveBtn = el('button', 'btn');
+  leaveBtn.type = 'button';
+  leaveBtn.textContent = 'Уйти на главную';
+
+  const close = (fn) => {
+    document.removeEventListener('keydown', onEsc);
+    overlay.remove();
+    if (fn) fn();
+  };
+  const onEsc = (e) => { if (e.key === 'Escape') close(onNo); };
+  stayBtn.addEventListener('click', () => close(onNo));
+  leaveBtn.addEventListener('click', () => close(onYes));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(onNo); });
+  document.addEventListener('keydown', onEsc);
+
+  btns.appendChild(leaveBtn);
+  btns.appendChild(stayBtn);
+  modal.appendChild(btns);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  stayBtn.focus();
 }
 
 /* ============================================================
