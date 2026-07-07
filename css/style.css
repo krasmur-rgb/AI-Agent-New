@@ -3,6 +3,14 @@
    Палитра и стиль — SPEC §8. Книжный, тёплая бумага, засечки.
    ============================================================ */
 
+/* Плакатная антиква для титула (вшита в проект, лицензия OFL — fonts/) */
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../fonts/PlayfairDisplay.ttf') format('truetype');
+  font-weight: 400 900;
+  font-display: swap;
+}
+
 :root {
   --paper:   #e8e0cd;
   --paper2:  #e0d7bf;
@@ -247,25 +255,28 @@ body.on-start #topbar { display: none; }
   left: 0;
   z-index: 2;
   max-width: none;
-  /* светлая пелена в тон пара/снега на кадре, полупрозрачная */
-  background: linear-gradient(160deg, rgba(236,233,228,0.42), rgba(222,219,213,0.30));
+  /* лёгкая тёмная дымка в тон паровоза — прозрачная, белые буквы читаются */
+  background: linear-gradient(160deg, rgba(38,34,28,0.40), rgba(38,34,28,0.24));
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   border-bottom-right-radius: 6px;
   padding: 16px 30px 13px 40px;
 }
 .start-hero-overlay .start-title {
-  font-size: 31px;
-  font-weight: 700;
-  margin: 0 0 3px;
+  font-family: 'Playfair Display', var(--serif);   /* плакатная антиква */
+  font-size: 33px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;      /* как на афише */
+  margin: 0 0 4px;
   white-space: nowrap;            /* заголовок в одну строку */
-  color: var(--ink);
-  text-shadow: 0 1px 6px rgba(236,233,228,0.55);
+  color: #ffffff;                 /* белая заливка букв */
+  text-shadow: 0 2px 10px rgba(0,0,0,0.45);
 }
 .start-hero-overlay .start-subtitle {
   font-size: 15px;
   font-style: italic;
-  color: rgba(32,28,22,0.78);
+  color: rgba(255,255,255,0.85);
   margin: 0;
 }
 /* кнопка музыки заставки — верхний правый угол картинки */
