@@ -1,0 +1,8 @@
+# Pinned exact versions — verified against quant/selftests (30 passed).
+# Resolved 2026-07-13 on Python 3.11. To refresh: bump, reinstall, re-run
+# `python -m pytest quant/selftests`, then re-pin from `pip freeze`.
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.0.3
+requests==2.34.2
+pytest==9.1.1

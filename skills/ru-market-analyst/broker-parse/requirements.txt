@@ -1,0 +1,7 @@
+# Pinned exact versions for the broker-parse tier (PDF/XLS parsing).
+# The upstream skill installs these ad-hoc ("pip install pypdf xlrd"); pinned
+# here for reproducibility. Resolved 2026-07-13 on Python 3.11.
+# pdfplumber is optional (used as a fallback for tricky PDF layouts).
+pypdf==6.14.2
+xlrd==2.0.2
+pdfplumber==0.11.10

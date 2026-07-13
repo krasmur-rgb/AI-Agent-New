@@ -1,0 +1,9 @@
+.claude/
+.DS_Store
+tests/
+.venv-parse/
+.venv-quant/
+__pycache__/
+*.pyc
+# Рабочие артефакты (дизайн-спеки, промо-драфты) — не часть поставляемого скилла
+docs/
